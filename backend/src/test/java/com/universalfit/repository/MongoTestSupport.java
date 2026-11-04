@@ -11,7 +11,7 @@ import org.testcontainers.utility.DockerImageName;
 public class MongoTestSupport {
     @Bean
     @ServiceConnection
-    MongoDBContainer mongo() {
+    MongoDBContainer mongoContainer() {   // must not be named "mongo": Spring Boot already defines that bean
         return new MongoDBContainer(DockerImageName.parse("mongo:7"));
     }
 }
