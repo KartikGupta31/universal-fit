@@ -1,0 +1,23 @@
+# Secrets
+.env
+*.pem
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# Java
+target/
+*.class
+
+# Node
+node_modules/
+.next/
+dist/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
