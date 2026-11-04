@@ -3,6 +3,8 @@ package com.universalfit.controller;
 
 import com.universalfit.domain.enums.Category;
 import com.universalfit.domain.model.Brand;
+import com.universalfit.dto.BrandResponse;
+import com.universalfit.dto.PageResponse;
 import com.universalfit.repository.BrandRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -48,7 +50,7 @@ public class BrandController {
             brands = brandRepository.findByActiveTrue(pageable);
         }
 
-        return ResponseEntity.ok(brands);
+        return ResponseEntity.ok(PageResponse.from(brands, BrandResponse::from));
     }
 
     // GET: Get one active brand by slug
@@ -57,7 +59,7 @@ public class BrandController {
 
         return brandRepository.findBySlug(slug)
                 .filter(Brand::isActive)
-                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .<ResponseEntity<?>>map(brand -> ResponseEntity.ok(BrandResponse.from(brand)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

@@ -3,6 +3,8 @@ package com.universalfit.controller;
 
 import com.universalfit.domain.enums.Category;
 import com.universalfit.domain.model.Product;
+import com.universalfit.dto.PageResponse;
+import com.universalfit.dto.ProductResponse;
 import com.universalfit.repository.BrandRepository;
 import com.universalfit.repository.ProductRepository;
 
@@ -67,7 +69,7 @@ public class ProductController {
             products = productRepository.findByActiveTrue(pageable);
         }
 
-        return ResponseEntity.ok(products);
+        return ResponseEntity.ok(PageResponse.from(products, ProductResponse::from));
     }
 
     // GET: Retrieve one product
@@ -85,7 +87,7 @@ public class ProductController {
                         .findById(product.getBrandId())
                         .map(brand -> brand.isActive())
                         .orElse(false))
-                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .<ResponseEntity<?>>map(product -> ResponseEntity.ok(ProductResponse.from(product)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

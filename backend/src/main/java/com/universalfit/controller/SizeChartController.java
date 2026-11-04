@@ -5,6 +5,7 @@ import com.universalfit.domain.enums.Category;
 import com.universalfit.domain.enums.MeasurementBasis;
 import com.universalfit.domain.enums.SizingSystem;
 import com.universalfit.domain.model.SizeChart;
+import com.universalfit.dto.SizeChartResponse;
 import com.universalfit.repository.BrandRepository;
 import com.universalfit.repository.SizeChartRepository;
 
@@ -81,7 +82,7 @@ public class SizeChartController {
                             .findByBrandIdAndActiveTrue(brandObjectId);
         }
 
-        return ResponseEntity.ok(charts);
+        return ResponseEntity.ok(charts.stream().map(SizeChartResponse::from).toList());
     }
 
     // GET: Retrieve a single size chart
@@ -100,7 +101,7 @@ public class SizeChartController {
                         .findById(chart.getBrandId())
                         .map(brand -> brand.isActive())
                         .orElse(false))
-                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .<ResponseEntity<?>>map(chart -> ResponseEntity.ok(SizeChartResponse.from(chart)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }
