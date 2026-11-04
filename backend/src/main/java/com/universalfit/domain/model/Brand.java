@@ -8,12 +8,16 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.*;
 import org.springframework.data.mongodb.core.index.*;
 import org.springframework.data.mongodb.core.mapping.Document;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 
 /** A fashion brand. Sizing lives in SizeChart, never on the brand itself. */
 @Document("brands")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Brand {
-    @Id private ObjectId id;
+    @Id
+    @JsonSerialize(using = com.fasterxml.jackson.databind.ser.std.ToStringSerializer.class)
+    private ObjectId id;
     @Indexed(unique = true) private String slug;
     @TextIndexed private String name;
     private String logoUrl;

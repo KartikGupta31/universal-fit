@@ -6,6 +6,8 @@ COPY src ./src
 RUN mvn -q -B -DskipTests package
 
 FROM eclipse-temurin:21-jre
+# Install curl for healthcheck requests
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 RUN useradd -m appuser
 COPY --from=build /build/target/universal-fit-backend-*.jar app.jar
