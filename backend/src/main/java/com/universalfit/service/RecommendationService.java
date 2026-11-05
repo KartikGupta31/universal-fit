@@ -1,0 +1,391 @@
+
+package com.universalfit.service;
+
+import com.universalfit.domain.enums.*;
+import com.universalfit.domain.model.*;
+import com.universalfit.integration.engine.EngineClient;
+import com.universalfit.integration.engine.EngineDtos;
+import com.universalfit.integration.engine.EngineUnavailableException;
+import com.universalfit.repository.*;
+
+import lombok.RequiredArgsConstructor;
+
+import org.bson.types.ObjectId;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class RecommendationService {
+
+    private final UserRepository userRepository;
+    private final MeasurementProfileRepository measurementProfileRepository;
+    private final ProductRepository productRepository;
+    private final BrandRepository brandRepository;
+    private final ProductSizeSpecRepository productSizeSpecRepository;
+    private final SizeChartRepository sizeChartRepository;
+    private final FitRecommendationRepository fitRecommendationRepository;
+    private final EngineClient engineClient;
+
+    /**
+     * Generate and persist a recommendation for an authenticated user.
+     */
+    public FitRecommendation recommend(String userEmail, ObjectId productId) {
+
+        // 1. Resolve user and validate account status and consent.
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "User not found"));
+
+        if (!user.isEnabled()) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, "User account is disabled");
+        }
+
+        if (!user.isMeasurementConsent()) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "User has not granted measurement consent");
+        }
+
+        // 2. Load measurement profile.
+        MeasurementProfile profile =
+                measurementProfileRepository.findByUserId(user.getId())
+                        .orElseThrow(() -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Measurement profile not found"));
+
+        // 3. Load and validate product.
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Product not found"));
+
+        if (!product.isActive()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Product is not active");
+        }
+
+        // 4. Load and validate brand.
+        Brand brand = brandRepository.findById(product.getBrandId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Brand not found"));
+
+        if (!brand.isActive()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Brand is not active");
+        }
+
+        // 5. Select sizing source.
+        // Product-specific measurements always take priority.
+        SizingSource source;
+
+        Optional<ProductSizeSpec> optionalSpec =
+                productSizeSpecRepository.findByProductId(productId);
+
+        if (optionalSpec.isPresent()) {
+
+            source = new SizingSource(optionalSpec.get(), null);
+
+        } else {
+
+            List<SizeChart> candidates =
+                    sizeChartRepository.findByBrandIdAndCategoryAndActiveTrue(
+                            product.getBrandId(),
+                            product.getCategory()
+                    );
+
+            List<SizeChart> filtered = candidates.stream()
+                    .filter(chart ->
+                            chart.getSizingSystem() == product.getSizingSystem()
+                                    && Objects.equals(
+                                            chart.getRegion(),
+                                            product.getRegion()
+                                    )
+                    )
+                    .collect(Collectors.toList());
+
+            if (filtered.isEmpty()) {
+                throw new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "No matching size chart available for product");
+            }
+
+            if (filtered.size() > 1) {
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT,
+                        "Multiple size charts match the product criteria");
+            }
+
+            source = new SizingSource(null, filtered.get(0));
+        }
+
+        // 6. Validate sizing source entries.
+        List<SizeEntry> entries = source.getSizes();
+
+        if (entries == null || entries.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Selected sizing source has no size entries");
+        }
+
+        // 7. Build engine request.
+        EngineDtos.Profile engineProfile =
+                buildEngineProfile(profile);
+
+        List<EngineDtos.Size> engineSizes =
+                buildEngineSizes(entries);
+
+        if (engineSizes.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Selected sizing source contains no usable sizes");
+        }
+
+        EngineDtos.RecommendRequest request =
+                new EngineDtos.RecommendRequest(
+                        engineProfile,
+                        product.getCategory(),
+                        product.getFitType(),
+                        source.getMeasurementBasis(),
+                        source.getUnit(),
+                        source.isGarmentFlat(),
+                        source.isChartVerified(),
+                        brand.getName(),
+                        engineSizes
+                );
+
+        // 8. Call recommendation engine.
+        EngineDtos.RecommendationResponse response;
+
+        try {
+            response = engineClient.recommend(request);
+
+        } catch (EngineUnavailableException ex) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "Recommendation engine unavailable");
+        }
+
+        if (response == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_GATEWAY,
+                    "Recommendation engine returned an invalid response");
+        }
+
+        // 9. Persist recommendation.
+        FitRecommendation recommendation =
+                FitRecommendation.builder()
+                        .userId(user.getId())
+                        .productId(product.getId())
+                        .brandId(brand.getId())
+
+                        // Null when a product-specific spec was used.
+                        .sizeChartId(source.getSizeChartId())
+
+                        .recommendedSize(response.recommendedSize())
+                        .confidence(response.confidence())
+                        .uncertain(response.uncertain())
+                        .fitType(response.fitType())
+                        .reason(response.reason())
+
+                        // Normalize nullable collections.
+                        .alternatives(
+                                response.alternatives() != null
+                                        ? response.alternatives()
+                                        : new ArrayList<>()
+                        )
+
+                        .measurementAnalysis(
+                                response.measurementAnalysis() != null
+                                        ? response.measurementAnalysis()
+                                        : new LinkedHashMap<>()
+                        )
+
+                        .warnings(
+                                response.warnings() != null
+                                        ? response.warnings()
+                                        : new ArrayList<>()
+                        )
+
+                        // Trust the selected source, not engine metadata.
+                        .chartVerified(source.isChartVerified())
+
+                        .build();
+
+        return fitRecommendationRepository.save(recommendation);
+    }
+
+    /**
+     * Convert stored measurement profile into engine profile.
+     */
+    private EngineDtos.Profile buildEngineProfile(
+            MeasurementProfile mp) {
+
+        Double weight = mp.getWeightKg();
+
+        // Stored weight is always in kilograms.
+        // Engine expects pounds when profile unit is IN.
+        if (mp.getUnit() == Unit.IN && weight != null) {
+            weight = weight / 0.45359237;
+        }
+
+        Map<String, Double> values = mp.getValues();
+
+        return new EngineDtos.Profile(
+                mp.getUnit(),
+                mp.getPreferredFit(),
+                getValue(values, "height"),
+                weight,
+                getValue(values, "chest"),
+                getValue(values, "waist"),
+                getValue(values, "hips"),
+                getValue(values, "shoulder"),
+                getValue(values, "neck"),
+                getValue(values, "sleeve"),
+                getValue(values, "inseam"),
+                getValue(values, "thigh"),
+                getValue(values, "footLength")
+        );
+    }
+
+    /**
+     * Safely retrieve an optional measurement.
+     */
+    private Double getValue(
+            Map<String, Double> map,
+            String key) {
+
+        if (map == null) {
+            return null;
+        }
+
+        return map.get(key);
+    }
+
+    /**
+     * Convert size entries into engine DTOs.
+     */
+    private List<EngineDtos.Size> buildEngineSizes(
+            List<SizeEntry> entries) {
+
+        if (entries == null || entries.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return entries.stream()
+                .filter(Objects::nonNull)
+                .map(entry -> new EngineDtos.Size(
+                        entry.getLabel(),
+                        mapMeasurements(entry.getMeasurements())
+                ))
+                .filter(size ->
+                        size.label() != null
+                                && !size.label().isBlank()
+                                && !size.measurements().isEmpty()
+                )
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Convert measurement ranges safely.
+     */
+    private Map<String, EngineDtos.Measurement> mapMeasurements(
+            Map<String, MeasurementRange> source) {
+
+        if (source == null || source.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, EngineDtos.Measurement> result =
+                new LinkedHashMap<>();
+
+        source.forEach((key, range) -> {
+
+            if (key != null && !key.isBlank() && range != null) {
+
+                result.put(
+                        key,
+                        new EngineDtos.Measurement(
+                                range.getMin(),
+                                range.getMax()
+                        )
+                );
+            }
+        });
+
+        return result;
+    }
+
+    /**
+     * Holds the selected sizing source.
+     */
+    private static class SizingSource {
+
+        private final ProductSizeSpec productSizeSpec;
+        private final SizeChart sizeChart;
+
+        SizingSource(
+                ProductSizeSpec productSizeSpec,
+                SizeChart sizeChart) {
+
+            this.productSizeSpec = productSizeSpec;
+            this.sizeChart = sizeChart;
+        }
+
+        List<SizeEntry> getSizes() {
+
+            if (productSizeSpec != null) {
+                return productSizeSpec.getSizes();
+            }
+
+            if (sizeChart != null) {
+                return sizeChart.getSizes();
+            }
+
+            return Collections.emptyList();
+        }
+
+        Unit getUnit() {
+
+            return productSizeSpec != null
+                    ? productSizeSpec.getUnit()
+                    : sizeChart.getUnit();
+        }
+
+        MeasurementBasis getMeasurementBasis() {
+
+            return productSizeSpec != null
+                    ? productSizeSpec.getMeasurementBasis()
+                    : sizeChart.getMeasurementBasis();
+        }
+
+        boolean isGarmentFlat() {
+
+            return productSizeSpec != null
+                    ? productSizeSpec.isGarmentFlat()
+                    : sizeChart.isGarmentFlat();
+        }
+
+        boolean isChartVerified() {
+
+            VerificationStatus status =
+                    productSizeSpec != null
+                            ? productSizeSpec.getVerificationStatus()
+                            : sizeChart.getVerificationStatus();
+
+            return status == VerificationStatus.VERIFIED;
+        }
+
+        ObjectId getSizeChartId() {
+
+            return sizeChart != null
+                    ? sizeChart.getId()
+                    : null;
+        }
+    }
+}
