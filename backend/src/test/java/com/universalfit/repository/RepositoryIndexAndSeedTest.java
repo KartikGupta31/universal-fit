@@ -3,6 +3,7 @@ package com.universalfit.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.universalfit.AbstractMongoIntegrationTest;
 import com.universalfit.domain.enums.*;
 import com.universalfit.domain.model.*;
 import com.universalfit.seed.DemoDataSeeder;
@@ -13,15 +14,18 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-@DataMongoTest(properties = "spring.data.mongodb.auto-index-creation=true")
-@Import({MongoTestSupport.class, DemoDataSeeder.class})
-class RepositoryIndexAndSeedTest {
+/**
+ * Index, uniqueness, pagination and demo-seed checks.
+ *
+ * <p>Extends {@link AbstractMongoIntegrationTest}: it runs under the "test" profile against the isolated
+ * Testcontainers MongoDB, the safety guard runs before the base class empties any collection, and this class
+ * contains no cleanup code of its own.
+ */
+class RepositoryIndexAndSeedTest extends AbstractMongoIntegrationTest {
 
     @Autowired MongoTemplate mongo;
     @Autowired UserRepository users;
@@ -31,31 +35,47 @@ class RepositoryIndexAndSeedTest {
     @Autowired ProductSizeSpecRepository specs;
     @Autowired SavedProductRepository saved;
     @Autowired MeasurementProfileRepository profiles;
-    @Autowired DemoDataSeeder seeder;
+
+    /** Built by hand: in the "test" profile the seeder bean is switched off (seed.demo-data=false). */
+    private DemoDataSeeder seeder;
 
     @BeforeEach
-    void clean() {
-        mongo.getCollectionNames().forEach(c -> mongo.getCollection(c).deleteMany(new org.bson.Document()));
+    void createSeeder() {
+        seeder = new DemoDataSeeder(brands, charts, products, specs);
     }
 
-    private Set<String> indexNames(String collection) {
-        return mongo.getCollection(collection).listIndexes()
-                .map(d -> d.getString("name")).into(new java.util.ArrayList<>())
-                .stream().collect(Collectors.toSet());
+    /**
+     * The key definition of every index on a collection, written as "field:direction,field:direction".
+     * Example: {userId: 1, recordedAt: -1} becomes "userId:1,recordedAt:-1". Field order matters in a
+     * compound index, so it is kept. Index NAMES are deliberately ignored: Spring Data and MongoDB may
+     * name single-field indexes differently (e.g. "email" vs "email_1"), but the key never changes.
+     */
+    private Set<String> indexKeys(String collection) {
+        Set<String> keys = new java.util.HashSet<>();
+        for (org.bson.Document index : mongo.getCollection(collection).listIndexes()) {
+            org.bson.Document key = index.get("key", org.bson.Document.class);
+            keys.add(key.entrySet().stream()
+                    .map(entry -> entry.getKey() + ":" + entry.getValue())
+                    .collect(Collectors.joining(",")));
+        }
+        return keys;
     }
 
     @Test
     void indexesAreCreatedForFrequentlyQueriedFields() {
         // Touch each collection so auto-index-creation has run for its entity.
         users.count(); profiles.count(); charts.count(); products.count(); saved.count();
-        assertThat(indexNames("users")).contains("email");
-        assertThat(indexNames("measurement_profiles")).contains("userId");
-        assertThat(indexNames("size_charts")).contains("chart_identity", "chart_lookup");
-        assertThat(indexNames("products")).contains("product_browse");
-        assertThat(indexNames("saved_products")).contains("user_product");
-        assertThat(indexNames("fit_recommendations")).contains("user_created");
-        assertThat(indexNames("fit_feedback")).contains("user_created", "brand_product");
-        assertThat(indexNames("measurement_history")).contains("user_recorded");
+
+        assertThat(indexKeys("users")).contains("email:1");
+        assertThat(indexKeys("measurement_profiles")).contains("userId:1");
+        assertThat(indexKeys("size_charts")).contains(
+                "brandId:1,category:1,sizingSystem:1,region:1,collection:1,measurementBasis:1",   // chart identity
+                "brandId:1,category:1,active:1");                                                  // chart lookup
+        assertThat(indexKeys("products")).contains("brandId:1,category:1,active:1");
+        assertThat(indexKeys("saved_products")).contains("userId:1,productId:1");
+        assertThat(indexKeys("fit_recommendations")).contains("userId:1,createdAt:-1");
+        assertThat(indexKeys("fit_feedback")).contains("userId:1,createdAt:-1", "brandId:1,productId:1");
+        assertThat(indexKeys("measurement_history")).contains("userId:1,recordedAt:-1");
     }
 
     @Test

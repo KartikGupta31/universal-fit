@@ -1,45 +1,20 @@
 package com.universalfit.controller;
 
-import com.universalfit.UniversalFitApplication;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.universalfit.AbstractMongoIntegrationTest;
 import com.universalfit.domain.model.User;
-import com.universalfit.repository.UserRepository;
-import com.universalfit.security.JwtUtil;
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.containers.MongoDBContainer;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-@SpringBootTest(classes = UniversalFitApplication.class)
-@AutoConfigureMockMvc
-@Testcontainers
-@ActiveProfiles("test")
-class AuthControllerTest {
-
-    @Container
-    static MongoDBContainer mongo = new MongoDBContainer("mongo:7.0.14");
-
-    @Autowired
-    MockMvc mockMvc;
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    JwtUtil jwtUtil;
-
-    @BeforeEach
-    void setUp() {
-        userRepository.deleteAll();
-    }
+/**
+ * Registration, login and refresh behaviour. Extends {@link AbstractMongoIntegrationTest}, so it only ever uses
+ * its own Testcontainers MongoDB and cleans only that database (never the Docker Compose development one).
+ */
+class AuthControllerTest extends AbstractMongoIntegrationTest {
 
     @Test
     void registrationSuccess() throws Exception {
@@ -53,11 +28,7 @@ class AuthControllerTest {
 
     @Test
     void duplicateEmailRejected() throws Exception {
-        User existing = User.builder()
-                .email("dup@example.com")
-                .passwordHash("hash")
-                .build();
-        userRepository.save(existing);
+        userRepository.save(User.builder().email("dup@example.com").passwordHash("hash").build());
         mockMvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"email\":\"dup@example.com\",\"password\":\"Secret123!\"}"))
@@ -67,15 +38,10 @@ class AuthControllerTest {
 
     @Test
     void loginSuccess() throws Exception {
-        // first register
-        mockMvc.perform(post("/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"login@example.com\",\"password\":\"Pass123!\"}"))
-                .andExpect(status().isOk());
-        // then login
+        register("login@example.com");
         mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"login@example.com\",\"password\":\"Pass123!\"}"))
+                        .content("{\"email\":\"login@example.com\",\"password\":\"" + PASSWORD + "\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").exists())
                 .andExpect(jsonPath("$.refreshToken").exists());
@@ -92,27 +58,28 @@ class AuthControllerTest {
 
     @Test
     void protectedEndpointRequiresAuth() throws Exception {
-        // Assuming there is a placeholder protected endpoint; we test a 401 on any /api path.
-        mockMvc.perform(get("/api/fit-recommendations"))
-                .andExpect(status().isUnauthorized());
+        // A real protected endpoint (the old test used a path that does not exist, so it proved nothing).
+        mockMvc.perform(get("/api/users/me")).andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/measurements/me")).andExpect(status().isUnauthorized());
     }
 
     @Test
     void refreshTokenRotation() throws Exception {
-        // Register and obtain refresh token
-        var result = mockMvc.perform(post("/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"refresh@example.com\",\"password\":\"Pass123!\"}"))
-                .andExpect(status().isOk())
-                .andReturn();
-        var json = result.getResponse().getContentAsString();
-        var refresh = new com.fasterxml.jackson.databind.ObjectMapper().readTree(json).get("refreshToken").asText();
-        // Use refresh endpoint
+        String refresh = register("refresh@example.com").get("refreshToken").asText();
         mockMvc.perform(post("/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"refreshToken\":\"" + refresh + "\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").exists())
                 .andExpect(jsonPath("$.refreshToken").exists());
+    }
+
+    @Test
+    void passwordHashIsNeverReturned() throws Exception {
+        String access = register("nohash@example.com").get("accessToken").asText();
+        mockMvc.perform(get("/api/users/me").header("Authorization", bearer(access)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.passwordHash").doesNotExist())
+                .andExpect(jsonPath("$.password").doesNotExist());
     }
 }

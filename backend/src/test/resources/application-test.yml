@@ -1,0 +1,14 @@
+# Used only by tests (profile "test"). Nothing here is a real secret or a real database.
+spring:
+  data:
+    mongodb:
+      # DELIBERATELY UNREACHABLE. Integration tests must use their own Testcontainers MongoDB
+      # (see AbstractMongoIntegrationTest). If that wiring ever breaks, tests fail instead of
+      # silently connecting to localhost:27017, which is the Docker Compose development database.
+      uri: mongodb://127.0.0.1:1/universalfit-test-never-used
+
+universalfit:
+  jwt:
+    secret: test-only-jwt-secret-not-a-real-secret-0123456789
+  seed:
+    demo-data: false

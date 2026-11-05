@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Authentication endpoints for registration, login, token refresh and logout.
@@ -63,19 +64,20 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(@Valid @RequestBody RefreshRequest request) {
-        String token = request.refreshToken();
-        // Validate refresh token (signature + expiration). Username is extracted for new tokens.
-        try {
-            String username = jwtUtil.extractUsername(token);
-            if (!jwtUtil.isTokenValid(token, username)) {
-                return ResponseEntity.status(401).body(Map.of("error", "Invalid or expired refresh token"));
-            }
-            var newAccess = jwtUtil.generateAccessToken(username);
-            var newRefresh = jwtUtil.generateRefreshToken(username); // rotation
-            return ResponseEntity.ok(Map.of("accessToken", newAccess, "refreshToken", newRefresh));
-        } catch (Exception e) {
-            return ResponseEntity.status(401).body(Map.of("error", "Invalid refresh token"));
+        // Only a valid REFRESH token is accepted (an access token is rejected), and the user must still
+        // exist and be enabled. One generic message for every failure, so nothing is revealed about why.
+        Optional<User> user = jwtUtil.validate(request.refreshToken(), JwtUtil.TokenType.REFRESH)
+                .flatMap(userRepository::findByEmail)
+                .filter(User::isEnabled);
+
+        if (user.isEmpty()) {
+            return ResponseEntity.status(401).body(Map.of("error", "Invalid or expired refresh token"));
         }
+
+        String email = user.get().getEmail();
+        var newAccess = jwtUtil.generateAccessToken(email);
+        var newRefresh = jwtUtil.generateRefreshToken(email); // rotation
+        return ResponseEntity.ok(Map.of("accessToken", newAccess, "refreshToken", newRefresh));
     }
 
     @PostMapping("/logout")

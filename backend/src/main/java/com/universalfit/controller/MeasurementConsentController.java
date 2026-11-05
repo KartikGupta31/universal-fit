@@ -27,29 +27,36 @@ public class MeasurementConsentController {
             Authentication authentication,
             @RequestBody ConsentRequest request) {
 
+        // Safety check FIRST, before touching any data: revoking consent deletes measurements, so the
+        // client must say so explicitly. A missing or null "consent" is a bad request, never "false".
+        if (request == null || request.consent() == null) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", "The 'consent' field is required and must be true or false"));
+        }
+        boolean granted = request.consent();
+
         User user = userRepository.findByEmail(authentication.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        user.setMeasurementConsent(request.consent());
-        user.setMeasurementConsentAt(
-                request.consent() ? Instant.now() : null
-        );
+        user.setMeasurementConsent(granted);
+        user.setMeasurementConsentAt(granted ? Instant.now() : null);
 
         userRepository.save(user);
 
         // Revoking consent also deletes current measurements and history.
-        if (!request.consent()) {
+        if (!granted) {
             profileRepository.deleteByUserId(user.getId());
             historyRepository.deleteByUserId(user.getId());
         }
 
         return ResponseEntity.ok(Map.of(
-                "measurementConsent", user.isMeasurementConsent(),
-                "message", request.consent()
+                "measurementConsent", granted,
+                "message", granted
                         ? "Measurement consent granted"
                         : "Measurement consent revoked and measurement data deleted"
         ));
     }
 
-    public record ConsentRequest(boolean consent) {}
+    /** {@code Boolean} (not {@code boolean}) on purpose: a missing field must stay null, not become false. */
+    public record ConsentRequest(Boolean consent) {}
 }
