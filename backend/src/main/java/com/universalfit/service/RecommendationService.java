@@ -6,6 +6,7 @@ import com.universalfit.domain.model.*;
 import com.universalfit.integration.engine.EngineClient;
 import com.universalfit.integration.engine.EngineDtos;
 import com.universalfit.integration.engine.EngineUnavailableException;
+import com.universalfit.integration.engine.EngineResponseException;
 import com.universalfit.repository.*;
 
 import lombok.RequiredArgsConstructor;
@@ -165,16 +166,38 @@ public class RecommendationService {
             response = engineClient.recommend(request);
 
         } catch (EngineUnavailableException ex) {
-
             throw new ResponseStatusException(
                     HttpStatus.SERVICE_UNAVAILABLE,
                     "Recommendation engine unavailable");
-        }
-
-        if (response == null) {
+        } catch (EngineResponseException ex) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_GATEWAY,
                     "Recommendation engine returned an invalid response");
+        }
+
+        if (response == null
+                || !Double.isFinite(response.confidence())
+                || response.confidence() < 0.0
+                || response.confidence() > 1.0
+                || response.fitType() == null
+                || response.reason() == null
+                || response.reason().isBlank()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_GATEWAY,
+                    "Recommendation engine returned an invalid response");
+        }
+
+        Set<String> allowedLabels = engineSizes.stream()
+                .map(EngineDtos.Size::label)
+                .collect(Collectors.toSet());
+        if ((response.recommendedSize() != null
+                && !allowedLabels.contains(response.recommendedSize()))
+                || (response.alternatives() != null
+                && response.alternatives().stream()
+                .anyMatch(label -> label == null || !allowedLabels.contains(label)))) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_GATEWAY,
+                    "Recommendation engine returned an unknown size label");
         }
 
         // 9. Persist recommendation.
