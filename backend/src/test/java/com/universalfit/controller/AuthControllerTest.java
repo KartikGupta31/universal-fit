@@ -37,6 +37,14 @@ class AuthControllerTest extends AbstractMongoIntegrationTest {
     }
 
     @Test
+    void blankEmailRejected() throws Exception {
+        mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\\"email\\":\\"\\",\\"password\\":\\"Secret123!\\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void loginSuccess() throws Exception {
         register("login@example.com");
         mockMvc.perform(post("/auth/login")
