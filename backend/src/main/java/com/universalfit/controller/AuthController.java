@@ -87,11 +87,11 @@ public class AuthController {
     }
 
     // DTOs -------------------------------------------------------------
-    record RegisterRequest(@Email String email,
+    record RegisterRequest(@NotBlank @Email String email,
                           @NotBlank String password,
                           String displayName) {}
 
-    record LoginRequest(@Email String email,
+    record LoginRequest(@NotBlank @Email String email,
                         @NotBlank String password) {}
 
     record RefreshRequest(@NotBlank String refreshToken) {}

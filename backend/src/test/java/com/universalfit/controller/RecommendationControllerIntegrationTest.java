@@ -1,53 +1,35 @@
 package com.universalfit.controller;
 
+import com.universalfit.AbstractMongoIntegrationTest;
 import com.universalfit.domain.model.FitRecommendation;
+import com.universalfit.security.CustomUserDetailsService;
 import com.universalfit.security.JwtUtil;
 import com.universalfit.service.RecommendationService;
-import com.universalfit.security.CustomUserDetailsService;
+import java.util.List;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import java.util.List;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@Import(com.universalfit.security.SecurityConfig.class)
-class RecommendationControllerIntegrationTest {
+class RecommendationControllerIntegrationTest extends AbstractMongoIntegrationTest {
 
     @Autowired
-    private MockMvc mvc;
-
-    @Autowired
-    private JwtUtil jwtUtil; // real bean with test secret
+    private JwtUtil jwtUtil;
 
     @MockBean
     private CustomUserDetailsService customUserDetailsService;
 
-    @TestConfiguration
-    static class TestConfig {
-        @Bean
-        public JwtUtil jwtUtil() {
-            String secret = "testsecrettestsecrettestsecrettestsecret"; // 32+ chars
-            return new JwtUtil(secret, 15, 14);
-        }
-    }
+    @MockBean
+    private RecommendationService recommendationService;
 
     @BeforeEach
     void setUp() {
@@ -60,47 +42,47 @@ class RecommendationControllerIntegrationTest {
                 .credentialsExpired(false)
                 .disabled(false)
                 .build();
-        Mockito.when(customUserDetailsService.loadUserByUsername("user@example.com")).thenReturn(user);
+        Mockito.when(customUserDetailsService.loadUserByUsername("user@example.com"))
+                .thenReturn(user);
     }
 
     @Test
-    @DisplayName("No token → 401 Unauthorized")
+    @DisplayName("No token returns 401 Unauthorized")
     void noToken() throws Exception {
-        mvc.perform(post("/api/recommendations/" + new ObjectId().toHexString()))
+        mockMvc.perform(post("/api/recommendations/" + new ObjectId().toHexString()))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
-    @DisplayName("Valid token + invalid product id → 400 Bad Request")
+    @DisplayName("Valid access token with invalid product ID returns 400")
     void invalidId() throws Exception {
         String token = jwtUtil.generateAccessToken("user@example.com");
-        mvc.perform(post("/api/recommendations/invalid-id")
-                        .header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON))
+
+        mockMvc.perform(post("/api/recommendations/invalid-id")
+                        .header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    @DisplayName("Valid token + valid product id → reaches RecommendationService and returns 200")
+    @DisplayName("Valid access token reaches the recommendation service")
     void validRequest() throws Exception {
         ObjectId productId = new ObjectId();
         String token = jwtUtil.generateAccessToken("user@example.com");
+        FitRecommendation expected = FitRecommendation.builder()
+                .recommendedSize("M")
+                .confidence(0.8)
+                .uncertain(false)
+                .reason("Test recommendation")
+                .build();
 
-        RecommendationService mockService = Mockito.mock(RecommendationService.class);
-        FitRecommendation dummy = FitRecommendation.builder().build();
-        Mockito.when(mockService.recommend(Mockito.eq("user@example.com"), Mockito.eq(productId)))
-                .thenReturn(dummy);
+        Mockito.when(recommendationService.recommend(eq("user@example.com"), eq(productId)))
+                .thenReturn(expected);
 
-        // Inject mock into controller
-        var controller = mvc.getDispatcherServlet().getWebApplicationContext()
-                .getBean(com.universalfit.controller.RecommendationController.class);
-        var field = com.universalfit.controller.RecommendationController.class.getDeclaredField("recommendationService");
-        field.setAccessible(true);
-        field.set(controller, mockService);
+        mockMvc.perform(post("/api/recommendations/" + productId.toHexString())
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
 
-        ResultActions result = mvc.perform(post("/api/recommendations/" + productId.toHexString())
-                        .header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON));
-        result.andExpect(status().isOk());
+        Mockito.verify(recommendationService)
+                .recommend("user@example.com", productId);
     }
 }
