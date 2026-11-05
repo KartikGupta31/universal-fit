@@ -3,8 +3,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestClient;
-import java.time.Duration;
 @Component
 public class EngineClient {
     private final RestClient restClient;
@@ -35,9 +36,14 @@ public class EngineClient {
                     .retrieve()
                     .body(EngineDtos.RecommendationResponse.class);
         } catch (ResourceAccessException ex) {
-            throw new EngineUnavailableException(
-                    "Recommendation engine is unavailable."
-            );
+            throw new EngineUnavailableException("Recommendation engine is unavailable.");
+        } catch (RestClientResponseException ex) {
+            if (ex.getStatusCode().is5xxServerError()) {
+                throw new EngineUnavailableException("Recommendation engine is unavailable.");
+            }
+            throw new EngineResponseException("Recommendation engine rejected the request.");
+        } catch (RestClientException ex) {
+            throw new EngineResponseException("Recommendation engine returned an invalid response.");
         }
     }
 }
