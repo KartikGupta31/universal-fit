@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Locale;
 
 /**
  * Loads a {@link User} from MongoDB and adapts it to Spring Security's {@link UserDetails}.
@@ -21,7 +21,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        String normalized = email.toLowerCase();
+        String normalized = email.toLowerCase(Locale.ROOT);
         User user = userRepository.findByEmail(normalized)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         List<SimpleGrantedAuthority> authorities = List.of(
