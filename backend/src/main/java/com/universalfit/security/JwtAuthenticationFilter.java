@@ -36,22 +36,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String header = request.getHeader("Authorization");
 
-        log.info("JWT CHECK: method={}, path={}, headerPresent={}",
-                request.getMethod(),
-                request.getRequestURI(),
-                header != null && header.startsWith(BEARER_PREFIX));
-
         if (header != null && header.startsWith(BEARER_PREFIX)) {
             String token = header.substring(BEARER_PREFIX.length()).trim();
 
-            var result = jwtUtil.validate(token, JwtUtil.TokenType.ACCESS);
-
-            log.info("JWT CHECK: tokenValid={}, method={}, path={}",
-                    result.isPresent(),
-                    request.getMethod(),
-                    request.getRequestURI());
-
-            result.ifPresent(email -> authenticate(email, request));
+            jwtUtil.validate(token, JwtUtil.TokenType.ACCESS)
+                    .ifPresent(email -> authenticate(email, request));
         }
 
         filterChain.doFilter(request, response);
