@@ -1,3 +1,4 @@
+
 package com.universalfit.security;
 
 import jakarta.servlet.FilterChain;
@@ -16,15 +17,6 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-/**
- * Reads {@code Authorization: Bearer <token>} and authenticates the request, but only when:
- * <ol>
- *   <li>the token is a valid, unexpired ACCESS token (refresh tokens are NOT accepted here), and</li>
- *   <li>the user still exists and is enabled.</li>
- * </ol>
- * In every other case the request simply stays unauthenticated, so protected endpoints answer 401 -
- * never a 500 - for bad tokens, deleted users and disabled users.
- */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -36,19 +28,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final CustomUserDetailsService userDetailsService;
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request,
-                                    @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain
+    ) throws ServletException, IOException {
 
         String header = request.getHeader("Authorization");
 
-        if (header != null
-                && header.startsWith(BEARER_PREFIX)
-                && SecurityContextHolder.getContext().getAuthentication() == null) {
+        log.info("JWT CHECK: method={}, path={}, headerPresent={}",
+                request.getMethod(),
+                request.getRequestURI(),
+                header != null && header.startsWith(BEARER_PREFIX));
 
+        if (header != null && header.startsWith(BEARER_PREFIX)) {
             String token = header.substring(BEARER_PREFIX.length()).trim();
-            jwtUtil.validate(token, JwtUtil.TokenType.ACCESS)
-                    .ifPresent(email -> authenticate(email, request));
+
+            var result = jwtUtil.validate(token, JwtUtil.TokenType.ACCESS);
+
+            log.info("JWT CHECK: tokenValid={}, method={}, path={}",
+                    result.isPresent(),
+                    request.getMethod(),
+                    request.getRequestURI());
+
+            result.ifPresent(email -> authenticate(email, request));
         }
 
         filterChain.doFilter(request, response);
@@ -57,13 +60,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private void authenticate(String email, HttpServletRequest request) {
         try {
             UserDetails user = userDetailsService.loadUserByUsername(email);
+
             if (!user.isEnabled()) {
                 log.debug("Rejected token for disabled user");
                 return;
             }
-            var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+            var authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            user, null, user.getAuthorities());
+
+            authentication.setDetails(
+                    new WebAuthenticationDetailsSource().buildDetails(request));
+
             SecurityContextHolder.getContext().setAuthentication(authentication);
+
         } catch (UsernameNotFoundException e) {
             log.debug("Rejected token for a user that no longer exists");
         }
