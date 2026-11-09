@@ -1,0 +1,125 @@
+.navbar {
+    width: 100%;
+    min-height: 82px;
+    padding: 0 6%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #faf9f6;
+    border-bottom: 1px solid #e9e5de;
+    position: relative;
+    z-index: 10;
+}
+
+.navbar-logo {
+    color: #171717;
+    text-decoration: none;
+    font-size: 23px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+.navbar-logo span {
+    color: #a47b55;
+    display: inline;
+}
+
+.navbar-logo small {
+    margin-top: 6px;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    color: #77716a;
+}
+
+.navbar-links {
+    display: flex;
+    align-items: center;
+    gap: 34px;
+}
+
+.nav-link {
+    color: #393630;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: color 0.2s;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: #a47b55;
+}
+
+.navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.login-link {
+    color: #292723;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.profile-button {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 13px 19px;
+    background: #24231f;
+    color: white;
+    text-decoration: none;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: background 0.2s;
+}
+
+.profile-button:hover {
+    background: #a47b55;
+}
+
+.mobile-menu {
+    display: none;
+    background: none;
+    border: none;
+    color: #222;
+    cursor: pointer;
+}
+
+@media (max-width: 900px) {
+    .navbar {
+        padding: 0 5%;
+    }
+
+    .navbar-links {
+        gap: 15px;
+    }
+
+    .navbar-actions {
+        gap: 12px;
+    }
+}
+
+@media (max-width: 650px) {
+    .navbar {
+        min-height: 72px;
+    }
+
+    .navbar-links,
+    .navbar-actions {
+        display: none;
+    }
+
+    .mobile-menu {
+        display: block;
+    }
+}

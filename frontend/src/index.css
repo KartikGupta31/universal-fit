@@ -1,0 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  font-family: 'DM Sans', sans-serif;
+  background: #faf9f6;
+  color: #292720;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+.site-footer {
+  background: #292720;
+  color: #fff;
+  padding: 42px 7%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.footer-brand {
+  font-size: 23px;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+.footer-brand span {
+  color: #c1a486;
+  font-weight: 400;
+}
+
+.site-footer p,
+.site-footer small {
+  color: #c4bfb5;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+}
+
+@media (max-width: 650px) {
+  .site-footer {
+    flex-direction: column;
+    text-align: center;
+  }
+}
