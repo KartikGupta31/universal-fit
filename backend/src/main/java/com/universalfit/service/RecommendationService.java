@@ -252,7 +252,7 @@ public class RecommendationService {
     }
 
 
-    public FitRecommendation recommendByBrandAndCategory(String userEmail, ObjectId brandId, Category category, String requestedRegion) {
+    public FitRecommendation recommendByBrandAndCategory(String userEmail, ObjectId brandId, Category category, String requestedRegion, SizingSystem requestedSizingSystem) {
         User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         if (!user.isEnabled()) throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User account is disabled");
         if (!user.isMeasurementConsent()) throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User has not granted measurement consent");
@@ -263,7 +263,9 @@ public class RecommendationService {
         if (brand.getCategories() == null || !brand.getCategories().contains(category))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This brand does not support the selected category");
 
-        List<Product> products = productRepository.findByActiveTrueAndBrandIdAndCategory(brandId, category);
+        List<Product> products = productRepository.findByActiveTrueAndBrandIdAndCategory(brandId, category).stream()
+                .filter(p -> p.getSizingSystem() == requestedSizingSystem)
+                .collect(Collectors.toList());
         List<SizeChart> charts = sizeChartRepository.findByBrandIdAndCategoryAndActiveTrue(brandId, category);
         Set<String> regions = new LinkedHashSet<>();
         products.stream().map(Product::getRegion).filter(r -> r != null && !r.isBlank()).forEach(regions::add);
@@ -285,7 +287,9 @@ public class RecommendationService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Multiple sizing references match this brand and category.");
 
         List<SizeChart> matches = charts.stream()
-                .filter(x -> selectedRegion == null || Objects.equals(x.getRegion(), selectedRegion)).collect(Collectors.toList());
+                .filter(x -> x.getSizingSystem() == requestedSizingSystem)
+                .filter(x -> selectedRegion == null || Objects.equals(x.getRegion(), selectedRegion))
+                .collect(Collectors.toList());
         if (matches.isEmpty()) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No size chart is available for this brand and category.");
         if (matches.size() > 1)
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Multiple size charts match this brand, category and region. The chart needs administrator clarification.");

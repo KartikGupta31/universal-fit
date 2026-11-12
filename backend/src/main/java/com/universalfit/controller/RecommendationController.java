@@ -19,11 +19,12 @@ public class RecommendationController {
             @PathVariable String brandId,
             @PathVariable com.universalfit.domain.enums.Category category,
             @RequestParam(required = false) String region,
+            @RequestParam com.universalfit.domain.enums.SizingSystem sizingSystem,
             Authentication authentication) {
         if (!ObjectId.isValid(brandId)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid brand ID");
         if (authentication == null || !authentication.isAuthenticated() || authentication.getName() == null || authentication.getName().isBlank())
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication is required");
-        return ResponseEntity.ok(recommendationService.recommendByBrandAndCategory(authentication.getName(), new ObjectId(brandId), category, region));
+        return ResponseEntity.ok(recommendationService.recommendByBrandAndCategory(authentication.getName(), new ObjectId(brandId), category, region, sizingSystem));
     }
 
     @PostMapping("/{productId}")

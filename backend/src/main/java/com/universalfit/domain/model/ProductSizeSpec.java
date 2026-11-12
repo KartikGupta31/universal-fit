@@ -20,6 +20,8 @@ public class ProductSizeSpec {
     private boolean garmentFlat;
     @Builder.Default private List<SizeEntry> sizes = new ArrayList<>();
     private String dataSource;
+    /** Exact official product page containing this style's size chart. */
+    private String sourceUrl;
     @Builder.Default private VerificationStatus verificationStatus = VerificationStatus.UNVERIFIED;
     private Instant lastVerifiedAt;
     @CreatedDate private Instant createdAt;

@@ -53,6 +53,7 @@ function FindSizePage() {
     const [brands, setBrands] = useState([])
     const [selectedBrand, setSelectedBrand] = useState('')
     const [selectedCategory, setSelectedCategory] = useState('')
+    const [selectedSizingSystem, setSelectedSizingSystem] = useState('MEN')
     const [selectedRegion, setSelectedRegion] = useState('')
     const [catalogLoading, setCatalogLoading] = useState(false)
     const [recommending, setRecommending] = useState(false)
@@ -248,7 +249,7 @@ function FindSizePage() {
         setRecommending(true)
 
         try {
-            const result = await getCategoryRecommendation(selectedBrand, selectedCategory, selectedRegion)
+            const result = await getCategoryRecommendation(selectedBrand, selectedCategory, selectedRegion, selectedSizingSystem)
             setRecommendation(result)
         } catch (err) {
             setError(err.message)
@@ -475,6 +476,14 @@ function FindSizePage() {
                     {catalogLoading ? <p>Loading brands...</p> : brands.length === 0 ? <p>No active brands are available yet.</p> : (
                         <>
                             <div className="selection-grid">
+                                <label className="product-select-label">Sizing for
+                                    <select value={selectedSizingSystem} onChange={event => {
+                                        setSelectedSizingSystem(event.target.value); setRecommendation(null); setError('');
+                                    }}>
+                                        <option value="MEN">Men</option>
+                                        <option value="WOMEN">Women</option>
+                                    </select>
+                                </label>
                                 <label className="product-select-label">Choose a brand
                                     <select value={selectedBrand} onChange={event => {
                                         setSelectedBrand(event.target.value); setSelectedCategory(''); setSelectedRegion('');

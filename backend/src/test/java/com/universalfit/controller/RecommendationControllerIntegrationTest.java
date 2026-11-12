@@ -3,6 +3,7 @@ package com.universalfit.controller;
 import com.universalfit.AbstractMongoIntegrationTest;
 import com.universalfit.domain.model.FitRecommendation;
 import com.universalfit.domain.enums.Category;
+import com.universalfit.domain.enums.SizingSystem;
 import com.universalfit.security.CustomUserDetailsService;
 import com.universalfit.security.JwtUtil;
 import com.universalfit.service.RecommendationService;
@@ -57,16 +58,17 @@ class RecommendationControllerIntegrationTest extends AbstractMongoIntegrationTe
                 .recommendedSize("M").confidence(0.8).reason("Category test").build();
 
         Mockito.when(recommendationService.recommendByBrandAndCategory(
-                eq("user@example.com"), eq(brandId), eq(Category.JEANS), eq("IN")))
+                eq("user@example.com"), eq(brandId), eq(Category.JEANS), eq("IN"), eq(SizingSystem.MEN)))
                 .thenReturn(expected);
 
         mockMvc.perform(post("/api/recommendations/brand/" + brandId.toHexString() + "/category/JEANS")
                         .param("region", "IN")
+                        .param("sizingSystem", "MEN")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
 
         Mockito.verify(recommendationService).recommendByBrandAndCategory(
-                "user@example.com", brandId, Category.JEANS, "IN");
+                "user@example.com", brandId, Category.JEANS, "IN", SizingSystem.MEN);
     }
 
     @Test

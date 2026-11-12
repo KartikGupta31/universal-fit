@@ -48,9 +48,10 @@ export async function getBrands(page = 0, size = 50) {
     return apiRequest(`/brands?page=${page}&size=${size}`)
 }
 
-export async function getCategoryRecommendation(brandId, category, region) {
-    const regionQuery = region ? `?region=${encodeURIComponent(region)}` : ''
-    return apiRequest(`/recommendations/brand/${brandId}/category/${category}${regionQuery}`, { method: 'POST' })
+export async function getCategoryRecommendation(brandId, category, region, sizingSystem) {
+    const params = new URLSearchParams({ sizingSystem })
+    if (region) params.set('region', region)
+    return apiRequest(`/recommendations/brand/${brandId}/category/${category}?${params.toString()}`, { method: 'POST' })
 }
 
 export async function getRecommendation(productId) {
