@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -38,7 +37,7 @@ public class AdminDashboardController {
     @GetMapping("/dashboard")
     public DashboardResponse dashboard(Authentication authentication) {
         requireAdmin(authentication);
-        Map<String, Long> feedbackBreakdown = new EnumMap<>(FeedbackType.class);
+        Map<String, Long> feedbackBreakdown = new java.util.LinkedHashMap<>();
         for (FeedbackType type : FeedbackType.values()) {
             feedbackBreakdown.put(type.name(), feedbackRepository.countByFeedback(type));
         }
