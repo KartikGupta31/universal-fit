@@ -7,6 +7,9 @@ import RegisterPage from './pages/RegisterPage'
 import { useAuth } from './context/AuthContext'
 import FindSizePage from './pages/FindSizePage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
+import BrandsPage from './pages/BrandsPage'
+import ComparePage from './pages/ComparePage'
+import SizeGuidePage from './pages/SizeGuidePage'
 
 function PlaceholderPage({ title }) {
   return (
@@ -50,9 +53,9 @@ function App() {
           />
 
           <Route path="/admin" element={<ProtectedRoute><AdminDashboardPage /></ProtectedRoute>} />
-          <Route path="/brands" element={<PlaceholderPage title="Explore Brands" />} />
-          <Route path="/compare" element={<PlaceholderPage title="Compare Sizes" />} />
-          <Route path="/size-guide" element={<PlaceholderPage title="Measurement Guide" />} />
+          <Route path="/brands" element={<BrandsPage />} />
+          <Route path="/compare" element={<ProtectedRoute><ComparePage /></ProtectedRoute>} />
+          <Route path="/size-guide" element={<SizeGuidePage />} />
           <Route path="/how-it-works" element={<PlaceholderPage title="How It Works" />} />
         </Route>
       </Routes>
