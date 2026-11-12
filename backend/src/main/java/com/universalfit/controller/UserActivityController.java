@@ -3,9 +3,11 @@ package com.universalfit.controller;
 import com.universalfit.domain.enums.FeedbackType;
 import com.universalfit.domain.model.FitFeedback;
 import com.universalfit.domain.model.FitRecommendation;
+import com.universalfit.domain.model.Brand;
 import com.universalfit.domain.model.User;
 import com.universalfit.repository.FitFeedbackRepository;
 import com.universalfit.repository.FitRecommendationRepository;
+import com.universalfit.repository.BrandRepository;
 import com.universalfit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
@@ -23,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class UserActivityController {
     private final UserRepository userRepository;
     private final FitRecommendationRepository recommendationRepository;
+    private final BrandRepository brandRepository;
     private final FitFeedbackRepository feedbackRepository;
 
     @GetMapping("/api/recommendations/history")
@@ -33,7 +36,15 @@ public class UserActivityController {
         validatePage(page, size);
         Page<FitRecommendation> results = recommendationRepository.findByUserId(
                 user.getId(), PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")));
-        return ResponseEntity.ok(results);
+        var brandIds = results.getContent().stream().map(FitRecommendation::getBrandId)
+                .filter(java.util.Objects::nonNull).distinct().toList();
+        var brandNames = brandRepository.findAllById(brandIds).stream()
+                .collect(java.util.stream.Collectors.toMap(Brand::getId, Brand::getName));
+        return ResponseEntity.ok(results.map(item -> new HistoryResponse(
+                item.getId().toHexString(),
+                item.getBrandId() == null ? "Unknown brand" : brandNames.getOrDefault(item.getBrandId(), "Unknown brand"),
+                item.getCategory(), item.getRecommendedSize(), item.getConfidence(), item.isUncertain(),
+                item.getReason(), item.getChartVerified(), item.getCreatedAt())));
     }
 
     @PostMapping("/api/feedback")
@@ -86,6 +97,10 @@ public class UserActivityController {
         return user;
     }
 
+    public record HistoryResponse(String id, String brandName,
+                                  com.universalfit.domain.enums.Category category, String recommendedSize,
+                                  double confidence, boolean uncertain, String reason,
+                                  boolean chartVerified, java.time.Instant createdAt) {}
     public record FeedbackRequest(String recommendationId, FeedbackType feedback, String purchasedSize, String comments) {}
     public record FeedbackResponse(String id, String recommendationId, FeedbackType feedback,
                                    String recommendedSize, String purchasedSize, String comments,
