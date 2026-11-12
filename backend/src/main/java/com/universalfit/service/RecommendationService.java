@@ -24,6 +24,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RecommendationService {
 
+    // Only dimensions currently understood by the recommendation engine are forwarded.
+    // Other source dimensions (for example garment length and leg opening) remain stored
+    // in the original chart/spec but are not part of the engine request contract.
+    private static final Set<String> ENGINE_MEASUREMENT_KEYS = Set.of(
+            "chest", "waist", "hips", "shoulder", "neck", "sleeve", "inseam", "thigh"
+    );
+
     private final UserRepository userRepository;
     private final MeasurementProfileRepository measurementProfileRepository;
     private final ProductRepository productRepository;
@@ -426,7 +433,7 @@ public class RecommendationService {
 
         source.forEach((key, range) -> {
 
-            if (key != null && !key.isBlank() && range != null) {
+            if (key != null && ENGINE_MEASUREMENT_KEYS.contains(key) && range != null) {
 
                 result.put(
                         key,
