@@ -262,6 +262,11 @@ public class RecommendationService {
         if (!brand.isActive()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Brand is not active");
         if (brand.getCategories() == null || !brand.getCategories().contains(category))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This brand does not support the selected category");
+        Map<Category, List<SizingSystem>> sizingAvailability = brand.getSizingSystemsByCategory();
+        if (sizingAvailability != null && !sizingAvailability.isEmpty()
+                && !sizingAvailability.getOrDefault(category, List.of()).contains(requestedSizingSystem))
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "No " + requestedSizingSystem + " size data is available for this brand and category.");
 
         List<Product> products = productRepository.findByActiveTrueAndBrandIdAndCategory(brandId, category).stream()
                 .filter(p -> p.getSizingSystem() == requestedSizingSystem)

@@ -46,6 +46,11 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
         Brand levis = saveBrand("levis", "Levi's", "https://levi.in/",
                 List.of(Category.T_SHIRT, Category.SHIRT, Category.JEANS),
                 "Only the exact linked India product styles have data. Trousers, jackets and dresses have not been sourced.");
+        levis.setSizingSystemsByCategory(Map.of(
+                Category.T_SHIRT, List.of(SizingSystem.MEN, SizingSystem.WOMEN),
+                Category.SHIRT, List.of(SizingSystem.MEN),
+                Category.JEANS, List.of(SizingSystem.WOMEN)));
+        brands.save(levis);
 
         // Men's slim-fit T-shirt, official table values in centimetres.
         product(levis, "Men's Solid Slim Fit T-shirt", Category.T_SHIRT, SizingSystem.MEN,
@@ -92,6 +97,7 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
         brand.setCountry("IN");
         brand.setSupportedRegions(List.of("IN"));
         brand.setCategories(new ArrayList<>(categories));
+        brand.setSizingSystemsByCategory(new EnumMap<>(Category.class));
         brand.setDataSource(officialUrl);
         brand.setVerificationStatus(VerificationStatus.UNVERIFIED);
         brand.setLastVerifiedAt(null);

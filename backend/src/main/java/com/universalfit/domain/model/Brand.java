@@ -20,6 +20,8 @@ public class Brand {
     private String country;
     @Builder.Default private List<String> supportedRegions = new ArrayList<>();
     @Indexed @Builder.Default private List<Category> categories = new ArrayList<>();
+    /** Exact gender systems with imported sizing data, keyed by category. */
+    @Builder.Default private Map<Category, List<SizingSystem>> sizingSystemsByCategory = new EnumMap<>(Category.class);
     private String dataSource;
     @Builder.Default private VerificationStatus verificationStatus = VerificationStatus.UNVERIFIED;
     private Instant lastVerifiedAt;

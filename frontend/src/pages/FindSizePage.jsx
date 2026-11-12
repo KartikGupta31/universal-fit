@@ -260,6 +260,7 @@ function FindSizePage() {
 
     const selectedBrandData = brands.find(brand => brand.id === selectedBrand)
     const supportedCategories = selectedBrandData?.categories || []
+    const supportedSizingSystems = selectedBrandData?.sizingSystemsByCategory?.[selectedCategory] || ['MEN', 'WOMEN']
     const categoryLabels = { T_SHIRT: 'T-shirts', SHIRT: 'Shirts', JEANS: 'Jeans', TROUSERS: 'Trousers', JACKET: 'Jackets', HOODIE: 'Hoodies', DRESS: 'Dresses', TOP: 'Tops' }
 
     if (loading) {
@@ -480,13 +481,12 @@ function FindSizePage() {
                                     <select value={selectedSizingSystem} onChange={event => {
                                         setSelectedSizingSystem(event.target.value); setRecommendation(null); setError('');
                                     }}>
-                                        <option value="MEN">Men</option>
-                                        <option value="WOMEN">Women</option>
+                                        {supportedSizingSystems.map(system => <option key={system} value={system}>{system === 'MEN' ? 'Men' : 'Women'}</option>)}
                                     </select>
                                 </label>
                                 <label className="product-select-label">Choose a brand
                                     <select value={selectedBrand} onChange={event => {
-                                        setSelectedBrand(event.target.value); setSelectedCategory(''); setSelectedRegion('');
+                                        setSelectedBrand(event.target.value); setSelectedCategory(''); setSelectedSizingSystem('MEN'); setSelectedRegion('');
                                         setRecommendation(null); setError('');
                                     }}>
                                         <option value="">Select a brand</option>
@@ -495,7 +495,7 @@ function FindSizePage() {
                                 </label>
                                 <label className="product-select-label">Choose a category
                                     <select value={selectedCategory} disabled={!selectedBrand} onChange={event => {
-                                        setSelectedCategory(event.target.value); setRecommendation(null); setError('');
+                                        setSelectedCategory(event.target.value); setSelectedSizingSystem((selectedBrandData?.sizingSystemsByCategory?.[event.target.value] || ['MEN', 'WOMEN'])[0]); setRecommendation(null); setError('');
                                     }}>
                                         <option value="">Select a category</option>
                                         {supportedCategories.map(category => <option key={category} value={category}>{categoryLabels[category] || category.replaceAll('_', ' ')}</option>)}
@@ -512,6 +512,9 @@ function FindSizePage() {
                                     </label>
                                 )}
                             </div>
+                            {selectedBrand && supportedCategories.length === 0 && (
+                                <p className="section-description">No importable India size charts are available for this brand yet. Its official sizing source is recorded, but measurements have not been invented.</p>
+                            )}
                             <button type="button" className="primary-button recommendation-button" onClick={handleRecommendation}
                                 disabled={!selectedBrand || !selectedCategory || recommending || !hasProfile}>
                                 {recommending ? 'Finding your size...' : 'Find My Size'}
