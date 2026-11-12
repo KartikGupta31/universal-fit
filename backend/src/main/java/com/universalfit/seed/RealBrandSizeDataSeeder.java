@@ -38,7 +38,14 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                 "Official India storefront. No reusable category chart has been imported.");
         Brand hm = saveBrand("h-and-m", "H&M",
                 "https://www2.hm.com/en_in/customer-service/sizeguide/sizing-faq.html", List.of(),
-                "India sizing guidance points shoppers to the size guide on individual product pages. No reusable category chart imported.");
+                "Two official India T-shirt product tables are retained as raw Width and Length values. The source does not define width axis/flat-vs-circumference, so these records are inactive and excluded from recommendations until verified.");
+        rawProduct(hm, "Men's Light green Loose Fit Washed T-shirt", Category.T_SHIRT, SizingSystem.MEN,
+                "https://www2.hm.com/en_in/productpage.1275904004.html", FitPreference.RELAXED,
+                List.of(widthRow("XS",100,66), widthRow("S",108,67), widthRow("M",116,68), widthRow("L",124,70)));
+        rawProduct(hm, "Women's Beige/Koiya Raglan-sleeved T-shirt", Category.T_SHIRT, SizingSystem.WOMEN,
+                "https://www2.hm.com/en_in/productpage.1308774001.html", FitPreference.REGULAR,
+                List.of(widthRow("XXS",69,48), widthRow("XS",72,50), widthRow("S",80,53),
+                        widthRow("M",88,55), widthRow("L",96,56), widthRow("XL",107,58)));
         Brand uniqlo = saveBrand("uniqlo", "UNIQLO",
                 "https://faq-in.uniqlo.com/pkb_Home_UQ_IN?id=kA0Ie000000TNqU",
                 List.of(Category.T_SHIRT, Category.TROUSERS),
@@ -191,6 +198,35 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
         return brands.save(brand);
     }
 
+    private void rawProduct(Brand brand, String name, Category category, SizingSystem sizingSystem,
+                            String sourceUrl, FitPreference fit, List<SizeEntry> sizes) {
+        Product product = products.findByProductUrl(sourceUrl).orElseGet(Product::new);
+        product.setName(name);
+        product.setBrandId(brand.getId());
+        product.setCategory(category);
+        product.setSizingSystem(sizingSystem);
+        product.setRegion("IN");
+        product.setProductUrl(sourceUrl);
+        product.setFitType(fit);
+        product.setAvailableSizes(sizes.stream().map(SizeEntry::getLabel).toList());
+        product.setDataSource("Official H&M India product page");
+        product.setVerificationStatus(VerificationStatus.UNVERIFIED);
+        product.setActive(false);
+        product = products.save(product);
+
+        ProductSizeSpec spec = specs.findByProductId(product.getId()).orElseGet(ProductSizeSpec::new);
+        spec.setProductId(product.getId());
+        spec.setMeasurementBasis(MeasurementBasis.GARMENT);
+        spec.setUnit(Unit.CM);
+        spec.setSizes(sizes);
+        spec.setDataSource("Official H&M India product page");
+        spec.setSourceUrl(sourceUrl);
+        spec.setVerificationStatus(VerificationStatus.UNVERIFIED);
+        spec.setRecommendationEligible(false);
+        spec.setMeasurementNotes("Source publishes Width and Length only; it does not define the width axis or whether it is flat width/circumference. Stored verbatim and excluded from recommendations pending measurement-method verification.");
+        specs.save(spec);
+    }
+
     private void product(Brand brand, String name, Category category, SizingSystem sizingSystem,
                          String sourceUrl, FitPreference fit, List<SizeEntry> sizes) {
         product(brand, name, category, sizingSystem, sourceUrl, fit, MeasurementBasis.GARMENT, sizes);
@@ -227,6 +263,13 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
 
     /** UNIQLO's body-size chart labels the upper-body circumference "Bust" for women's styles;
      * normalize that equivalent body circumference to the profile's chest field. */
+    private static SizeEntry widthRow(String label, double width, double length) {
+        Map<String, MeasurementRange> m = new LinkedHashMap<>();
+        m.put("width", MeasurementRange.of(width));
+        m.put("length", MeasurementRange.of(length));
+        return new SizeEntry(label, m);
+    }
+
     private static SizeEntry bodyRow(String label, Double chestMin, Double chestMax,
                                      Double waistMin, Double waistMax,
                                      Double hipMin, Double hipMax) {

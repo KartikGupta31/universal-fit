@@ -22,6 +22,9 @@ public class ProductSizeSpec {
     private String dataSource;
     /** Exact official product page containing this style's size chart. */
     private String sourceUrl;
+    /** False when source dimensions are retained verbatim but are not safe for recommendations yet. */
+    @Builder.Default private Boolean recommendationEligible = true;
+    private String measurementNotes;
     @Builder.Default private VerificationStatus verificationStatus = VerificationStatus.UNVERIFIED;
     private Instant lastVerifiedAt;
     @CreatedDate private Instant createdAt;
