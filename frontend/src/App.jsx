@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import { useAuth } from './context/AuthContext'
 import FindSizePage from './pages/FindSizePage'
+import AdminDashboardPage from './pages/AdminDashboardPage'
 
 function PlaceholderPage({ title }) {
   return (
@@ -48,6 +49,7 @@ function App() {
             }
           />
 
+          <Route path="/admin" element={<ProtectedRoute><AdminDashboardPage /></ProtectedRoute>} />
           <Route path="/brands" element={<PlaceholderPage title="Explore Brands" />} />
           <Route path="/compare" element={<PlaceholderPage title="Compare Sizes" />} />
           <Route path="/size-guide" element={<PlaceholderPage title="Measurement Guide" />} />

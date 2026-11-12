@@ -11,5 +11,6 @@ public interface FitFeedbackRepository extends MongoRepository<FitFeedback, Obje
     Page<FitFeedback> findByUserId(ObjectId userId, Pageable pageable);
     Page<FitFeedback> findByModerationStatus(ModerationStatus status, Pageable pageable);
     long countByFeedback(FeedbackType type);
+    long countByModerationStatus(ModerationStatus status);
     void deleteByUserId(ObjectId userId);
 }
