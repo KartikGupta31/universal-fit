@@ -44,7 +44,7 @@ public class UserActivityController {
                 item.getId().toHexString(),
                 item.getBrandId() == null ? "Unknown brand" : brandNames.getOrDefault(item.getBrandId(), "Unknown brand"),
                 item.getCategory(), item.getRecommendedSize(), item.getConfidence(), item.isUncertain(),
-                item.getReason(), item.getChartVerified(), item.getCreatedAt())));
+                item.getReason(), item.isChartVerified(), item.getCreatedAt())));
     }
 
     @PostMapping("/api/feedback")
