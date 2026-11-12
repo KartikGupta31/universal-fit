@@ -34,12 +34,26 @@ function MeasurementDiagram({ type, label }) {
     }
     return <div className="measurement-diagram" role="img" aria-label={label + ' measurement placement diagram'}>
         <svg viewBox="0 0 210 340" xmlns="http://www.w3.org/2000/svg">
-            <g className="diagram-body">
-                <circle cx="100" cy="31" r="19" />
-                <path d="M81 55 Q57 58 48 83 L28 151 Q25 164 38 169 L51 174 L65 119 L61 207 Q58 220 68 224 L65 315 Q64 326 78 326 L91 229 L99 225 L108 229 L117 315 Q118 326 132 326 L130 224 Q141 220 138 207 L135 119 L149 174 L162 169 Q175 164 172 151 L152 83 Q143 58 119 55 Z" />
-            </g>
-            <g className="diagram-measure">{lines[type]}</g>
-            <g className="diagram-endpoints">{type === 'height' ? <><circle cx="177" cy="20" r="3"/><circle cx="177" cy="320" r="3"/></> : null}</g>
+            {type === 'foot' ? <>
+                <g className="diagram-body">
+                    <path d="M38 174 C38 158 47 143 61 136 C76 128 91 130 105 124 C120 117 130 99 145 91 C158 84 174 88 181 101 C188 114 181 128 174 139 C166 151 163 164 165 178 C168 195 160 211 145 218 C128 226 110 216 96 211 C80 205 65 211 51 202 C42 196 38 186 38 174 Z" />
+                    <path d="M143 91 C149 80 160 76 168 82 C176 87 175 97 170 105" />
+                </g>
+                <g className="diagram-measure">
+                    <path d="M39 246 L181 246" />
+                    <path d="M39 237 L39 255 M181 237 L181 255" />
+                    <path d="M47 240 L39 246 L47 252 M173 240 L181 246 L173 252" />
+                </g>
+                <g className="diagram-endpoints"><circle cx="39" cy="246" r="4"/><circle cx="181" cy="246" r="4"/></g>
+                <text x="110" y="273" textAnchor="middle" className="diagram-svg-label">HEEL TO LONGEST TOE</text>
+            </> : <>
+                <g className="diagram-body">
+                    <circle cx="100" cy="31" r="19" />
+                    <path d="M81 55 Q57 58 48 83 L28 151 Q25 164 38 169 L51 174 L65 119 L61 207 Q58 220 68 224 L65 315 Q64 326 78 326 L91 229 L99 225 L108 229 L117 315 Q118 326 132 326 L130 224 Q141 220 138 207 L135 119 L149 174 L162 169 Q175 164 172 151 L152 83 Q143 58 119 55 Z" />
+                </g>
+                <g className="diagram-measure">{lines[type]}</g>
+                <g className="diagram-endpoints">{type === 'height' ? <><circle cx="177" cy="20" r="3"/><circle cx="177" cy="320" r="3"/></> : null}</g>
+            </>}
         </svg>
         <span>{label}</span>
     </div>
