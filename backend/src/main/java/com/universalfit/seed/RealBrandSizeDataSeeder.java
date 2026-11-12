@@ -274,13 +274,13 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
         return new SizeEntry(label, m);
     }
 
-    private static SizeEntry bodyRow(String label, Double chestMin, Double chestMax,
-                                     Double waistMin, Double waistMax,
-                                     Double hipMin, Double hipMax) {
+    private static SizeEntry bodyRow(String label, Number chestMin, Number chestMax,
+                                     Number waistMin, Number waistMax,
+                                     Number hipMin, Number hipMax) {
         Map<String, MeasurementRange> m = new LinkedHashMap<>();
-        if (chestMin != null && chestMax != null) m.put("chest", MeasurementRange.of(chestMin, chestMax));
-        if (waistMin != null && waistMax != null) m.put("waist", MeasurementRange.of(waistMin, waistMax));
-        if (hipMin != null && hipMax != null) m.put("hips", MeasurementRange.of(hipMin, hipMax));
+        if (chestMin != null && chestMax != null) m.put("chest", MeasurementRange.of(chestMin.doubleValue(), chestMax.doubleValue()));
+        if (waistMin != null && waistMax != null) m.put("waist", MeasurementRange.of(waistMin.doubleValue(), waistMax.doubleValue()));
+        if (hipMin != null && hipMax != null) m.put("hips", MeasurementRange.of(hipMin.doubleValue(), hipMax.doubleValue()));
         return new SizeEntry(label, m);
     }
 
