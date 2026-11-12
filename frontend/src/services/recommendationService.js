@@ -48,6 +48,7 @@ async function apiRequest(endpoint, options = {}) {
                 ? `Request failed with status ${response.status}: ${responseText}`
                 : `Request failed with status ${response.status}`)
         )
+    }
 
     return data
 }
