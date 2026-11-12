@@ -494,3 +494,27 @@
         font-size: 22px;
     }
 }
+
+.brand-sizing-unavailable {
+    max-width: 760px;
+    margin-top: 22px;
+    padding: 20px 22px;
+    border: 1px solid #e6e1d9;
+    border-left: 3px solid #a48665;
+    background: #fff;
+}
+
+.brand-sizing-unavailable strong {
+    display: block;
+    color: #282622;
+    font-family: Georgia, serif;
+    font-size: 19px;
+    font-weight: 400;
+}
+
+.brand-sizing-unavailable p {
+    margin: 8px 0 0;
+    color: #777168;
+    font-size: 13px;
+    line-height: 1.7;
+}

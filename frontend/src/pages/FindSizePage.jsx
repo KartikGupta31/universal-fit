@@ -479,46 +479,57 @@ function FindSizePage() {
                             <div className="selection-grid">
                                 <label className="product-select-label">Choose a brand
                                     <select value={selectedBrand} onChange={event => {
-                                        setSelectedBrand(event.target.value); setSelectedCategory(''); setSelectedSizingSystem('UNISEX'); setSelectedRegion('');
+                                        setSelectedBrand(event.target.value); setSelectedCategory(''); setSelectedSizingSystem(''); setSelectedRegion('');
                                         setRecommendation(null); setError('');
                                     }}>
                                         <option value="">Select a brand</option>
                                         {brands.map(brand => <option key={brand.id} value={brand.id}>{brand.name}</option>)}
                                     </select>
                                 </label>
-                                <label className="product-select-label">Choose a category
-                                    <select value={selectedCategory} disabled={!selectedBrand} onChange={event => {
-                                        setSelectedCategory(event.target.value); setSelectedSizingSystem((selectedBrandData?.sizingSystemsByCategory?.[event.target.value] || ['UNISEX'])[0]); setRecommendation(null); setError('');
-                                    }}>
-                                        <option value="">Select a category</option>
-                                        {supportedCategories.map(category => <option key={category} value={category}>{categoryLabels[category] || category.replaceAll('_', ' ')}</option>)}
-                                    </select>
-                                </label>
-                                <label className="product-select-label">Sizing for
-                                    <select value={selectedSizingSystem} onChange={event => {
-                                        setSelectedSizingSystem(event.target.value); setRecommendation(null); setError('');
-                                    }}>
-                                        {supportedSizingSystems.map(system => <option key={system} value={system}>{system === 'MEN' ? 'Men' : system === 'WOMEN' ? 'Women' : 'Unisex'}</option>)}
-                                    </select>
-                                </label>
-                                {selectedBrandData?.supportedRegions?.length > 1 && (
-                                    <label className="product-select-label">Sizing region
-                                        <select value={selectedRegion} onChange={event => {
-                                            setSelectedRegion(event.target.value); setRecommendation(null);
-                                        }}>
-                                            <option value="">Auto-detect region</option>
-                                            {selectedBrandData.supportedRegions.map(region => <option key={region} value={region}>{region}</option>)}
-                                        </select>
-                                    </label>
+                                {supportedCategories.length > 0 && (
+                                    <>
+                                        <label className="product-select-label">Choose a category
+                                            <select value={selectedCategory} disabled={!selectedBrand} onChange={event => {
+                                                const systems = selectedBrandData?.sizingSystemsByCategory?.[event.target.value] || [];
+                                                setSelectedCategory(event.target.value); setSelectedSizingSystem(systems[0] || ''); setRecommendation(null); setError('');
+                                            }}>
+                                                <option value="">Select a category</option>
+                                                {supportedCategories.map(category => <option key={category} value={category}>{categoryLabels[category] || category.replaceAll('_', ' ')}</option>)}
+                                            </select>
+                                        </label>
+                                        <label className="product-select-label">Sizing for
+                                            <select value={selectedSizingSystem} disabled={!selectedCategory || supportedSizingSystems.length === 0} onChange={event => {
+                                                setSelectedSizingSystem(event.target.value); setRecommendation(null); setError('');
+                                            }}>
+                                                {!selectedCategory && <option value="">Choose a category first</option>}
+                                                {selectedCategory && supportedSizingSystems.map(system => <option key={system} value={system}>{system === 'MEN' ? 'Men' : system === 'WOMEN' ? 'Women' : 'Unisex'}</option>)}
+                                            </select>
+                                        </label>
+                                        {selectedBrandData?.supportedRegions?.length > 1 && (
+                                            <label className="product-select-label">Sizing region
+                                                <select value={selectedRegion} onChange={event => {
+                                                    setSelectedRegion(event.target.value); setRecommendation(null);
+                                                }}>
+                                                    <option value="">Auto-detect region</option>
+                                                    {selectedBrandData.supportedRegions.map(region => <option key={region} value={region}>{region}</option>)}
+                                                </select>
+                                            </label>
+                                        )}
+                                    </>
                                 )}
                             </div>
                             {selectedBrand && supportedCategories.length === 0 && (
-                                <p className="section-description">No importable India size charts are available for this brand yet. Its official sizing source is recorded, but measurements have not been invented.</p>
+                                <div className="brand-sizing-unavailable" role="status">
+                                    <strong>Size recommendations coming soon</strong>
+                                    <p>We're working on verifying this brand's size-chart data. Categories and sizing options will become available once reliable measurements are confirmed.</p>
+                                </div>
                             )}
-                            <button type="button" className="primary-button recommendation-button" onClick={handleRecommendation}
-                                disabled={!selectedBrand || !selectedCategory || recommending || !hasProfile}>
-                                {recommending ? 'Finding your size...' : 'Find My Size'}
-                            </button>
+                            {supportedCategories.length > 0 && (
+                                <button type="button" className="primary-button recommendation-button" onClick={handleRecommendation}
+                                    disabled={!selectedBrand || !selectedCategory || !selectedSizingSystem || recommending || !hasProfile}>
+                                    {recommending ? 'Finding your size...' : 'Find My Size'}
+                                </button>
+                            )}
                         </>
                     )}
                 </section>
