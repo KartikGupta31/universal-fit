@@ -17,6 +17,7 @@ public class FitRecommendation {
     private ObjectId userId;
     @Indexed private ObjectId productId;
     private ObjectId brandId;
+    private Category category;
     private ObjectId sizeChartId;          // null when a product-specific spec was used
     private String recommendedSize;        // null when the engine declined to guess
     private double confidence;

@@ -7,9 +7,8 @@ import {
     saveMeasurements,
 } from '../services/measurementService'
 import {
-    getProducts,
     getBrands,
-    getRecommendation,
+    getCategoryRecommendation,
 } from '../services/recommendationService'
 import './FindSizePage.css'
 
@@ -51,9 +50,10 @@ function FindSizePage() {
     const [weightKg, setWeightKg] = useState('')
     const [hasProfile, setHasProfile] = useState(false)
 
-    const [products, setProducts] = useState([])
     const [brands, setBrands] = useState([])
-    const [selectedProduct, setSelectedProduct] = useState('')
+    const [selectedBrand, setSelectedBrand] = useState('')
+    const [selectedCategory, setSelectedCategory] = useState('')
+    const [selectedRegion, setSelectedRegion] = useState('')
     const [catalogLoading, setCatalogLoading] = useState(false)
     const [recommending, setRecommending] = useState(false)
     const [recommendation, setRecommendation] = useState(null)
@@ -92,15 +92,10 @@ function FindSizePage() {
         setCatalogLoading(true)
 
         try {
-            const [productData, brandData] = await Promise.all([
-                getProducts(),
-                getBrands(),
-            ])
-
-            setProducts(productData?.content || [])
+            const brandData = await getBrands()
             setBrands(brandData?.content || [])
         } catch (err) {
-            setError(`Could not load products: ${err.message}`)
+            setError(`Could not load brands: ${err.message}`)
         } finally {
             setCatalogLoading(false)
         }
@@ -238,8 +233,8 @@ function FindSizePage() {
     }
 
     async function handleRecommendation() {
-        if (!selectedProduct) {
-            setError('Please select a product first.')
+        if (!selectedBrand || !selectedCategory) {
+            setError('Please select a brand and clothing category first.')
             return
         }
 
@@ -253,7 +248,7 @@ function FindSizePage() {
         setRecommending(true)
 
         try {
-            const result = await getRecommendation(selectedProduct)
+            const result = await getCategoryRecommendation(selectedBrand, selectedCategory, selectedRegion)
             setRecommendation(result)
         } catch (err) {
             setError(err.message)
@@ -262,13 +257,9 @@ function FindSizePage() {
         }
     }
 
-    function getBrandName(brandId) {
-        return brands.find(brand => brand.id === brandId)?.name || 'Unknown brand'
-    }
-
-    const selectedProductData = products.find(
-        product => product.id === selectedProduct
-    )
+    const selectedBrandData = brands.find(brand => brand.id === selectedBrand)
+    const supportedCategories = selectedBrandData?.categories || []
+    const categoryLabels = { T_SHIRT: 'T-shirts', SHIRT: 'Shirts', JEANS: 'Jeans', TROUSERS: 'Trousers', JACKET: 'Jackets', HOODIE: 'Hoodies', DRESS: 'Dresses', TOP: 'Tops' }
 
     if (loading) {
         return (
@@ -480,77 +471,40 @@ function FindSizePage() {
                 <section className="measurement-section product-selector-section">
                     <p className="eyebrow">PERSONALIZED RECOMMENDATION</p>
                     <h2>Find your size across brands.</h2>
-                    <p className="section-description">
-                        Choose a product and we'll compare its size chart with your measurements.
-                    </p>
-
-                    {catalogLoading ? (
-                        <p>Loading products...</p>
-                    ) : products.length === 0 ? (
-                        <p>No active products are available yet.</p>
-                    ) : (
+                    <p className="section-description">Select a brand and clothing category. We'll use your saved measurements and that brand's size chart.</p>
+                    {catalogLoading ? <p>Loading brands...</p> : brands.length === 0 ? <p>No active brands are available yet.</p> : (
                         <>
-                            <label className="product-select-label">
-                                Select a product
-
-                                <select
-                                    value={selectedProduct}
-                                    onChange={event => {
-                                        setSelectedProduct(event.target.value)
-                                        setRecommendation(null)
-                                        setError('')
-                                    }}
-                                >
-                                    <option value="">Choose a product</option>
-
-                                    {products.map(product => (
-                                        <option key={product.id} value={product.id}>
-                                            {product.name} — {getBrandName(product.brandId)}
-                                        </option>
-                                    ))}
-                                </select>
-                            </label>
-
-                            {selectedProductData && (
-                                <div className="selected-product">
-                                    {selectedProductData.imageUrl && (
-                                        <img
-                                            src={selectedProductData.imageUrl}
-                                            alt={selectedProductData.name}
-                                        />
-                                    )}
-
-                                    <div>
-                                        <p className="eyebrow">
-                                            {getBrandName(selectedProductData.brandId)}
-                                        </p>
-                                        <h3>{selectedProductData.name}</h3>
-                                        <p>{selectedProductData.category}</p>
-
-                                        {selectedProductData.price != null && (
-                                            <p>
-                                                {selectedProductData.currency || ''}
-                                                {' '}
-                                                {selectedProductData.price}
-                                            </p>
-                                        )}
-
-                                        {selectedProductData.availableSizes?.length > 0 && (
-                                            <p>
-                                                Available sizes:{' '}
-                                                {selectedProductData.availableSizes.join(', ')}
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-
-                            <button
-                                type="button"
-                                className="primary-button recommendation-button"
-                                onClick={handleRecommendation}
-                                disabled={!selectedProduct || recommending || !hasProfile}
-                            >
+                            <div className="selection-grid">
+                                <label className="product-select-label">Choose a brand
+                                    <select value={selectedBrand} onChange={event => {
+                                        setSelectedBrand(event.target.value); setSelectedCategory(''); setSelectedRegion('');
+                                        setRecommendation(null); setError('');
+                                    }}>
+                                        <option value="">Select a brand</option>
+                                        {brands.map(brand => <option key={brand.id} value={brand.id}>{brand.name}</option>)}
+                                    </select>
+                                </label>
+                                <label className="product-select-label">Choose a category
+                                    <select value={selectedCategory} disabled={!selectedBrand} onChange={event => {
+                                        setSelectedCategory(event.target.value); setRecommendation(null); setError('');
+                                    }}>
+                                        <option value="">Select a category</option>
+                                        {supportedCategories.map(category => <option key={category} value={category}>{categoryLabels[category] || category.replaceAll('_', ' ')}</option>)}
+                                    </select>
+                                </label>
+                                {selectedBrandData?.supportedRegions?.length > 1 && (
+                                    <label className="product-select-label">Sizing region
+                                        <select value={selectedRegion} onChange={event => {
+                                            setSelectedRegion(event.target.value); setRecommendation(null);
+                                        }}>
+                                            <option value="">Auto-detect region</option>
+                                            {selectedBrandData.supportedRegions.map(region => <option key={region} value={region}>{region}</option>)}
+                                        </select>
+                                    </label>
+                                )}
+                            </div>
+                            <button type="button" className="primary-button recommendation-button" onClick={handleRecommendation}
+                                disabled={!selectedBrand || !selectedCategory || recommending || !hasProfile}>
                                 {recommending ? 'Finding your size...' : 'Find My Size'}
                             </button>
                         </>
@@ -569,7 +523,7 @@ function FindSizePage() {
                             </div>
                         ) : (
                             <p className="recommendation-warning">
-                                We couldn't confidently recommend a size for this product.
+                                We couldn't confidently recommend a size for this brand and category.
                             </p>
                         )}
 

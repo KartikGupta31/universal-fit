@@ -250,6 +250,80 @@ public class RecommendationService {
         return fitRecommendationRepository.save(recommendation);
     }
 
+
+    public FitRecommendation recommendByBrandAndCategory(String userEmail, ObjectId brandId, Category category, String requestedRegion) {
+        User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        if (!user.isEnabled()) throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User account is disabled");
+        if (!user.isMeasurementConsent()) throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User has not granted measurement consent");
+        MeasurementProfile profile = measurementProfileRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Measurement profile not found"));
+        Brand brand = brandRepository.findById(brandId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Brand not found"));
+        if (!brand.isActive()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Brand is not active");
+        if (brand.getCategories() == null || !brand.getCategories().contains(category))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This brand does not support the selected category");
+
+        List<Product> products = productRepository.findByActiveTrueAndBrandIdAndCategory(brandId, category);
+        List<SizeChart> charts = sizeChartRepository.findByBrandIdAndCategoryAndActiveTrue(brandId, category);
+        Set<String> regions = new LinkedHashSet<>();
+        products.stream().map(Product::getRegion).filter(r -> r != null && !r.isBlank()).forEach(regions::add);
+        charts.stream().map(SizeChart::getRegion).filter(r -> r != null && !r.isBlank()).forEach(regions::add);
+        String region = requestedRegion == null || requestedRegion.isBlank() ? null : requestedRegion.trim().toUpperCase(Locale.ROOT);
+        if (region == null && regions.size() > 1)
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Choose a sizing region: " + String.join(", ", regions));
+        if (region == null && regions.size() == 1) region = regions.iterator().next();
+        if (region != null && !regions.isEmpty() && !regions.contains(region))
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No sizing data is available for region " + region);
+
+        final String selectedRegion = region;
+        List<Product> regionalProducts = products.stream()
+                .filter(x -> selectedRegion == null || Objects.equals(x.getRegion(), selectedRegion)).collect(Collectors.toList());
+        List<Product> withSpecs = regionalProducts.stream()
+                .filter(x -> productSizeSpecRepository.findByProductId(x.getId()).isPresent()).collect(Collectors.toList());
+        if (withSpecs.size() == 1) return recommend(userEmail, withSpecs.get(0).getId());
+        if (withSpecs.size() > 1)
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Multiple sizing references match this brand and category.");
+
+        List<SizeChart> matches = charts.stream()
+                .filter(x -> selectedRegion == null || Objects.equals(x.getRegion(), selectedRegion)).collect(Collectors.toList());
+        if (matches.isEmpty()) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No size chart is available for this brand and category.");
+        if (matches.size() > 1)
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Multiple size charts match this brand, category and region. The chart needs administrator clarification.");
+        SizeChart chart = matches.get(0);
+        List<EngineDtos.Size> engineSizes = buildEngineSizes(chart.getSizes());
+        if (engineSizes.isEmpty()) throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "The selected size chart contains no usable sizes.");
+
+        EngineDtos.RecommendRequest request = new EngineDtos.RecommendRequest(
+                buildEngineProfile(profile), category, chart.getFitType(), chart.getMeasurementBasis(),
+                chart.getUnit(), chart.isGarmentFlat(), chart.getVerificationStatus() == VerificationStatus.VERIFIED,
+                brand.getName(), engineSizes);
+        EngineDtos.RecommendationResponse response;
+        try {
+            response = engineClient.recommend(request);
+        } catch (EngineUnavailableException ex) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Recommendation engine unavailable");
+        } catch (EngineRejectedRequestException ex) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Your saved measurements or this size chart could not be processed. Please review your measurements and try again.");
+        } catch (EngineResponseException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Recommendation engine returned an invalid response");
+        }
+        if (response == null || !Double.isFinite(response.confidence()) || response.confidence() < 0 || response.confidence() > 1
+                || response.fitType() == null || response.reason() == null || response.reason().isBlank())
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Recommendation engine returned an invalid response");
+        Set<String> allowed = engineSizes.stream().map(EngineDtos.Size::label).collect(Collectors.toSet());
+        if ((response.recommendedSize() != null && !allowed.contains(response.recommendedSize()))
+                || (response.alternatives() != null && response.alternatives().stream().anyMatch(x -> x == null || !allowed.contains(x))))
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Recommendation engine returned an unknown size label");
+
+        FitRecommendation result = FitRecommendation.builder().userId(user.getId()).brandId(brand.getId())
+                .category(category).sizeChartId(chart.getId()).recommendedSize(response.recommendedSize())
+                .confidence(response.confidence()).uncertain(response.uncertain()).fitType(response.fitType())
+                .reason(response.reason()).alternatives(response.alternatives() == null ? new ArrayList<>() : response.alternatives())
+                .measurementAnalysis(response.measurementAnalysis() == null ? new LinkedHashMap<>() : response.measurementAnalysis())
+                .warnings(response.warnings() == null ? new ArrayList<>() : response.warnings())
+                .chartVerified(chart.getVerificationStatus() == VerificationStatus.VERIFIED).build();
+        return fitRecommendationRepository.save(result);
+    }
+
     /**
      * Convert stored measurement profile into engine profile.
      */

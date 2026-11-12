@@ -12,6 +12,7 @@ public interface ProductRepository extends MongoRepository<Product, ObjectId> {
     Page<Product> findByActiveTrueAndBrandId(ObjectId brandId, Pageable pageable);
     Page<Product> findByActiveTrueAndCategory(Category category, Pageable pageable);
     Page<Product> findByActiveTrueAndBrandIdAndCategory(ObjectId brandId, Category category, Pageable pageable);
+    List<Product> findByActiveTrueAndBrandIdAndCategory(ObjectId brandId, Category category);
     long countByActiveTrue();
     long countByBrandId(ObjectId brandId);
 }

@@ -380,74 +380,14 @@
     }
 }
 
-/* Product selector */
-
-.product-selector-section {
-    margin-top: 36px;
-    padding-top: 36px;
-    border-top: 1px solid #e8e2d9;
-}
-
-.product-select-label {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 24px;
-    max-width: 520px;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.product-select-label select {
-    width: 100%;
-    padding: 15px;
-    border: 1px solid #d8d1c7;
-    border-radius: 6px;
-    background: #fff;
-    color: #24211e;
-    font: inherit;
-    outline: none;
-}
-
-.product-select-label select:focus {
-    border-color: #24211e;
-}
-
-.selected-product {
-    display: flex;
-    align-items: center;
-    gap: 22px;
-    max-width: 600px;
-    margin-top: 24px;
-    padding: 20px;
-    border: 1px solid #e8e2d9;
-    border-radius: 8px;
-    background: #fff;
-}
-
-.selected-product img {
-    width: 120px;
-    height: 140px;
-    object-fit: cover;
-    border-radius: 4px;
-    background: #f3f0eb;
-}
-
-.selected-product h3 {
-    margin: 8px 0;
-    font-size: 19px;
-}
-
-.selected-product p {
-    margin: 6px 0;
-    color: #77716a;
-    font-size: 13px;
-}
-
-.recommendation-button {
-    margin-top: 24px;
-    min-width: 200px;
-}
+/* Brand and category selector */
+.product-selector-section { margin-top: 36px; padding-top: 36px; border-top: 1px solid #e8e2d9; }
+.selection-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; max-width: 760px; margin-top: 24px; }
+.product-select-label { display: flex; flex-direction: column; gap: 10px; min-width: 0; font-size: 13px; font-weight: 600; }
+.product-select-label select { width: 100%; padding: 15px; border: 1px solid #d8d1c7; border-radius: 6px; background: #fff; color: #24211e; font: inherit; outline: none; }
+.product-select-label select:focus { border-color: #24211e; }
+.product-select-label select:disabled { background: #f1eee9; color: #999187; cursor: not-allowed; }
+.recommendation-button { margin-top: 24px; min-width: 200px; }
 
 /* Recommendation result */
 
@@ -544,16 +484,7 @@
 }
 
 @media (max-width: 600px) {
-    .selected-product {
-        align-items: flex-start;
-        gap: 14px;
-        padding: 14px;
-    }
-
-    .selected-product img {
-        width: 90px;
-        height: 115px;
-    }
+    .selection-grid { grid-template-columns: 1fr; }
 
     .recommendation-result {
         padding: 20px;

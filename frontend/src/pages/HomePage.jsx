@@ -26,8 +26,8 @@ const steps = [
     {
         number: '03',
         icon: Shirt,
-        title: 'SELECT A PRODUCT',
-        description: 'Choose the clothing item you want to find your size for.',
+        title: 'CHOOSE A CATEGORY',
+        description: 'Choose T-shirts, shirts, jeans, trousers or another clothing category.',
     },
     {
         number: '04',
