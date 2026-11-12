@@ -40,16 +40,52 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                 "https://www2.hm.com/en_in/customer-service/sizeguide/sizing-faq.html", List.of(),
                 "India sizing guidance points shoppers to the size guide on individual product pages. No reusable category chart imported.");
         Brand uniqlo = saveBrand("uniqlo", "UNIQLO",
-                "https://faq-in.uniqlo.com/pkb_Home_UQ_IN?fs=RelatedArticle&id=kA0Ie000000TP16&l=en_US",
-                List.of(), "India sizing guidance is product-specific; no generic category chart imported.");
+                "https://faq-in.uniqlo.com/pkb_Home_UQ_IN?id=kA0Ie000000TNqU",
+                List.of(Category.T_SHIRT, Category.TROUSERS),
+                "India product-specific body-size charts imported for a unisex T-shirt, women's T-shirt and women's trousers. Source distinguishes body measurements from garment measurements.");
+
+        // UNIQLO publishes explicit BODY SIZE tables on these India product pages.
+        // Its help page distinguishes body measurements from product widths; these imported
+        // rows are only the tables explicitly labelled Body Size.
+        uniqlo.setSizingSystemsByCategory(Map.of(
+                Category.T_SHIRT, List.of(SizingSystem.UNISEX, SizingSystem.WOMEN),
+                Category.TROUSERS, List.of(SizingSystem.WOMEN)));
+        brands.save(uniqlo);
+        product(uniqlo, "Unisex Supima Cotton Crew Neck Short Sleeve T-Shirt",
+                Category.T_SHIRT, SizingSystem.UNISEX,
+                "https://www.uniqlo.com/in/en/products/E455365-000/00?colorDisplayCode=12&sizeDisplayCode=005",
+                FitPreference.REGULAR, MeasurementBasis.BODY,
+                List.of(
+                    bodyRow("S",80,88,68,76,null,null), bodyRow("M",88,96,76,84,null,null),
+                    bodyRow("L",96,104,84,92,null,null), bodyRow("XL",104,112,92,100,null,null),
+                    bodyRow("XXL",112,120,100,108,null,null), bodyRow("3XL",120,128,108,115,null,null)));
+        product(uniqlo, "Women's Supima Cotton T-Shirt",
+                Category.T_SHIRT, SizingSystem.WOMEN,
+                "https://www.uniqlo.com/in/en/products/E474408-000/00?colorCode=COL11&sizeCode=SMA004",
+                FitPreference.REGULAR, MeasurementBasis.BODY,
+                List.of(
+                    bodyRow("XS",73,79,57,63,80,86), bodyRow("S",77,83,61,67,84,90),
+                    bodyRow("M",81,87,65,71,88,94), bodyRow("L",85,91,69,75,92,98),
+                    bodyRow("XL",91,97,75,81,98,104), bodyRow("XXL",97,103,81,87,104,110),
+                    bodyRow("3XL",103,109,87,93,110,115)));
+        product(uniqlo, "Women's Smart Wide Pants",
+                Category.TROUSERS, SizingSystem.WOMEN,
+                "https://www.uniqlo.com/in/en/products/E479292-000/00?colorCode=COL58&sizeCode=SMA003",
+                FitPreference.REGULAR, MeasurementBasis.BODY,
+                List.of(
+                    bodyRow("S",null,null,61,67,84,90), bodyRow("M",null,null,65,71,88,94),
+                    bodyRow("L",null,null,69,75,92,98), bodyRow("XL",null,null,75,81,98,104),
+                    bodyRow("XXL",null,null,81,87,104,110)));
 
         Brand levis = saveBrand("levis", "Levi's", "https://levi.in/",
                 List.of(Category.T_SHIRT, Category.SHIRT, Category.JEANS),
-                "Only the exact linked India product styles have data. Trousers, jackets and dresses have not been sourced.");
+                "Exact linked India product styles have style-specific charts for T-shirts, shirts, jeans, trousers and jackets. No numerical India dress chart was found. All imported values remain UNVERIFIED pending review.");
         levis.setSizingSystemsByCategory(Map.of(
                 Category.T_SHIRT, List.of(SizingSystem.MEN, SizingSystem.WOMEN),
-                Category.SHIRT, List.of(SizingSystem.MEN),
-                Category.JEANS, List.of(SizingSystem.WOMEN)));
+                Category.SHIRT, List.of(SizingSystem.MEN, SizingSystem.WOMEN),
+                Category.JEANS, List.of(SizingSystem.MEN, SizingSystem.WOMEN),
+                Category.TROUSERS, List.of(SizingSystem.MEN),
+                Category.JACKET, List.of(SizingSystem.MEN, SizingSystem.WOMEN)));
         brands.save(levis);
 
         // Men's slim-fit T-shirt, official table values in centimetres.
@@ -76,6 +112,55 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                     row("S", 44.45, 101.60, 68.58), row("M", 46.99, 107.95, 71.12),
                     row("L", 48.90, 115.57, 73.66), row("XL", 50.80, 123.19, 76.20),
                     row("XXL", 53.34, 130.81, 78.74), row("XXXL", 55.88, 138.43, 81.28)));
+
+        // Men's 501 Black Straight Fit Mid Rise Jeans.
+        product(levis, "Men's 501 Black Straight Fit Mid Rise Jeans", Category.JEANS, SizingSystem.MEN,
+                "https://levi.in/products/mens-501-black-regular-fit-jeans-798300026", FitPreference.REGULAR,
+                List.of(
+                    jeansWithHips("24",71.12,97.79,54.31), jeansWithHips("25",73.66,100.33,55.58),
+                    jeansWithHips("26",77.47,103.84,57.15), jeansWithHips("27",80.01,106.37,58.42),
+                    jeansWithHips("28",82.55,108.91,59.69), jeansWithHips("29",85.09,111.45,60.96),
+                    jeansWithHips("30",88.90,114.94,62.56), jeansWithHips("31",91.44,117.48,63.83),
+                    jeansWithHips("32",93.98,120.02,65.10), jeansWithHips("33",96.52,122.56,66.37),
+                    jeansWithHips("34",99.70,126.06,67.95), jeansWithHips("35",102.24,128.60,69.22),
+                    jeansWithHips("36",104.78,131.14,70.49), jeansWithHips("38",110.49,136.85,73.36),
+                    jeansWithHips("40",116.21,142.56,76.20), jeansWithHips("42",121.92,148.27,79.04),
+                    jeansWithHips("44",127.64,153.98,81.92)));
+
+        // Women's solid comfort-fit shirt.
+        product(levis, "Women's Solid Comfort Fit Shirt", Category.SHIRT, SizingSystem.WOMEN,
+                "https://levi.in/products/womens-solid-comfort-fit-shirt-0027m0011", FitPreference.RELAXED,
+                List.of(
+                    row("XXS",44.45,106.68,63.50), row("XS",45.72,111.76,64.77),
+                    row("S",46.99,116.84,66.04), row("M",48.26,121.92,67.31),
+                    row("L",50.17,128.27,68.58), row("XL",52.07,135.89,68.96),
+                    row("XXL",53.98,143.51,69.12), row("XXXL",55.88,151.13,69.53)));
+
+        // Men's slim-fit trousers.
+        product(levis, "Men's Slim Fit Trousers", Category.TROUSERS, SizingSystem.MEN,
+                "https://levi.in/products/mens-slim-fit-trousers-a40690000", FitPreference.SLIM,
+                List.of(
+                    bottom("XXS",66.04,99.72,57.50,29.85), bottom("XS",71.12,104.78,59.99,31.75),
+                    bottom("S",76.20,109.96,62.55,33.66), bottom("M",83.82,117.48,66.36,35.56),
+                    bottom("L",91.44,125.20,70.17,37.47), bottom("XL",99.06,132.72,74.05,39.37),
+                    bottom("XXL",109.22,140.97,79.08,41.91), bottom("XXXL",119.38,149.22,84.16,44.45)));
+
+        // Men's solid black jacket.
+        product(levis, "Men's Solid Black Jacket", Category.JACKET, SizingSystem.MEN,
+                "https://levi.in/products/mens-solid-black-jacket-002a80000", FitPreference.REGULAR,
+                List.of(
+                    row("S",45.72,107.95,69.22), row("M",46.99,113.03,71.12),
+                    row("L",48.59,119.38,73.03), row("XL",50.17,127.00,74.93),
+                    row("XXL",51.76,134.62,76.84)));
+
+        // Women's solid regular-fit jacket.
+        product(levis, "Women's Solid Regular Fit Jacket", Category.JACKET, SizingSystem.WOMEN,
+                "https://levi.in/products/womens-solid-regular-fit-jacket-006h40000", FitPreference.REGULAR,
+                List.of(
+                    row("XXS",50.80,86.36,47.63), row("XS",52.07,91.44,48.58),
+                    row("S",53.34,96.52,49.53), row("M",54.61,101.60,50.48),
+                    row("L",56.20,107.95,51.44), row("XL",58.10,115.57,51.44),
+                    row("XXL",60.01,123.19,51.44)));
 
         // Women's 501 Original Jeans. Source provides waist, thigh and leg-opening dimensions.
         product(levis, "Women's 501 Original Jeans", Category.JEANS, SizingSystem.WOMEN,
@@ -108,6 +193,11 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
 
     private void product(Brand brand, String name, Category category, SizingSystem sizingSystem,
                          String sourceUrl, FitPreference fit, List<SizeEntry> sizes) {
+        product(brand, name, category, sizingSystem, sourceUrl, fit, MeasurementBasis.GARMENT, sizes);
+    }
+
+    private void product(Brand brand, String name, Category category, SizingSystem sizingSystem,
+                         String sourceUrl, FitPreference fit, MeasurementBasis basis, List<SizeEntry> sizes) {
         Product product = products.findByProductUrl(sourceUrl).orElseGet(Product::new);
         product.setName(name);
         product.setBrandId(brand.getId());
@@ -124,7 +214,7 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
 
         ProductSizeSpec spec = specs.findByProductId(product.getId()).orElseGet(ProductSizeSpec::new);
         spec.setProductId(product.getId());
-        spec.setMeasurementBasis(MeasurementBasis.GARMENT);
+        spec.setMeasurementBasis(basis);
         spec.setUnit(Unit.CM);
         spec.setGarmentFlat(false);
         spec.setSizes(sizes);
@@ -135,11 +225,40 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
         specs.save(spec);
     }
 
+    /** UNIQLO's body-size chart labels the upper-body circumference "Bust" for women's styles;
+     * normalize that equivalent body circumference to the profile's chest field. */
+    private static SizeEntry bodyRow(String label, Double chestMin, Double chestMax,
+                                     Double waistMin, Double waistMax,
+                                     Double hipMin, Double hipMax) {
+        Map<String, MeasurementRange> m = new LinkedHashMap<>();
+        if (chestMin != null && chestMax != null) m.put("chest", MeasurementRange.of(chestMin, chestMax));
+        if (waistMin != null && waistMax != null) m.put("waist", MeasurementRange.of(waistMin, waistMax));
+        if (hipMin != null && hipMax != null) m.put("hips", MeasurementRange.of(hipMin, hipMax));
+        return new SizeEntry(label, m);
+    }
+
     private static SizeEntry row(String label, double shoulder, double chest, double length) {
         Map<String, MeasurementRange> m = new LinkedHashMap<>();
         m.put("shoulder", MeasurementRange.of(shoulder));
         m.put("chest", MeasurementRange.of(chest));
         m.put("length", MeasurementRange.of(length));
+        return new SizeEntry(label, m);
+    }
+
+    private static SizeEntry jeansWithHips(String label, double waist, double hips, double thigh) {
+        Map<String, MeasurementRange> m = new LinkedHashMap<>();
+        m.put("waist", MeasurementRange.of(waist));
+        m.put("hips", MeasurementRange.of(hips));
+        m.put("thigh", MeasurementRange.of(thigh));
+        return new SizeEntry(label, m);
+    }
+
+    private static SizeEntry bottom(String label, double waist, double hips, double thigh, double legOpening) {
+        Map<String, MeasurementRange> m = new LinkedHashMap<>();
+        m.put("waist", MeasurementRange.of(waist));
+        m.put("hips", MeasurementRange.of(hips));
+        m.put("thigh", MeasurementRange.of(thigh));
+        m.put("legOpening", MeasurementRange.of(legOpening));
         return new SizeEntry(label, m);
     }
 

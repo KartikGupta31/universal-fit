@@ -477,13 +477,6 @@ function FindSizePage() {
                     {catalogLoading ? <p>Loading brands...</p> : brands.length === 0 ? <p>No active brands are available yet.</p> : (
                         <>
                             <div className="selection-grid">
-                                <label className="product-select-label">Sizing for
-                                    <select value={selectedSizingSystem} onChange={event => {
-                                        setSelectedSizingSystem(event.target.value); setRecommendation(null); setError('');
-                                    }}>
-                                        {supportedSizingSystems.map(system => <option key={system} value={system}>{system === 'MEN' ? 'Men' : 'Women'}</option>)}
-                                    </select>
-                                </label>
                                 <label className="product-select-label">Choose a brand
                                     <select value={selectedBrand} onChange={event => {
                                         setSelectedBrand(event.target.value); setSelectedCategory(''); setSelectedSizingSystem('MEN'); setSelectedRegion('');
@@ -499,6 +492,13 @@ function FindSizePage() {
                                     }}>
                                         <option value="">Select a category</option>
                                         {supportedCategories.map(category => <option key={category} value={category}>{categoryLabels[category] || category.replaceAll('_', ' ')}</option>)}
+                                    </select>
+                                </label>
+                                <label className="product-select-label">Sizing for
+                                    <select value={selectedSizingSystem} onChange={event => {
+                                        setSelectedSizingSystem(event.target.value); setRecommendation(null); setError('');
+                                    }}>
+                                        {supportedSizingSystems.map(system => <option key={system} value={system}>{system === 'MEN' ? 'Men' : system === 'WOMEN' ? 'Women' : 'Unisex'}</option>)}
                                     </select>
                                 </label>
                                 {selectedBrandData?.supportedRegions?.length > 1 && (
