@@ -86,7 +86,7 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                     bodyRow("XXL",null,null,81,87,104,110)));
 
         Brand levis = saveBrand("levis", "Levi's", "https://levi.in/",
-                List.of(Category.T_SHIRT, Category.SHIRT, Category.JEANS),
+                List.of(Category.T_SHIRT, Category.SHIRT, Category.JEANS, Category.TROUSERS, Category.JACKET),
                 "Exact linked India product styles have style-specific charts for T-shirts, shirts, jeans, trousers and jackets. No numerical India dress chart was found. All imported values remain UNVERIFIED pending review.");
         levis.setSizingSystemsByCategory(Map.of(
                 Category.T_SHIRT, List.of(SizingSystem.MEN, SizingSystem.WOMEN),
