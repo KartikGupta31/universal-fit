@@ -62,6 +62,9 @@ function FindSizePage() {
     const [recommending, setRecommending] = useState(false)
     const [recommendation, setRecommendation] = useState(null)
     const [history, setHistory] = useState([])
+    const [historyPage, setHistoryPage] = useState(0)
+    const [historyHasMore, setHistoryHasMore] = useState(false)
+    const [historyLoadingMore, setHistoryLoadingMore] = useState(false)
     const [feedbackByRecommendation, setFeedbackByRecommendation] = useState({})
     const [feedbackChoice, setFeedbackChoice] = useState('')
     const [purchasedSize, setPurchasedSize] = useState('')
@@ -100,19 +103,36 @@ function FindSizePage() {
         }
     }
 
-    async function loadActivity() {
+    async function loadActivity(page = 0, append = false) {
         try {
-            const [historyData, feedbackData] = await Promise.all([
-                getRecommendationHistory(0, 10), getFitFeedback(0, 50),
-            ])
-            setHistory(historyData?.content || [])
-            const map = {}
-            ;(feedbackData?.content || []).forEach(item => {
-                if (item.recommendationId) map[item.recommendationId] = item
-            })
-            setFeedbackByRecommendation(map)
+            const historyData = await getRecommendationHistory(page, 10)
+            const items = historyData?.content || []
+            setHistory(current => append ? [...current, ...items] : items)
+            setHistoryPage(page)
+            setHistoryHasMore(historyData?.last === false || (historyData?.totalPages != null && page + 1 < historyData.totalPages))
+
+            try {
+                const feedbackData = await getFitFeedback(0, 50)
+                const map = {}
+                ;(feedbackData?.content || []).forEach(item => {
+                    if (item.recommendationId) map[item.recommendationId] = item
+                })
+                setFeedbackByRecommendation(map)
+            } catch (feedbackErr) {
+                console.error('Could not load fit feedback:', feedbackErr)
+            }
         } catch (err) {
             setError(`Could not load recommendation history: ${err.message}`)
+        }
+    }
+
+    async function handleLoadMoreHistory() {
+        if (!historyHasMore || historyLoadingMore) return
+        setHistoryLoadingMore(true)
+        try {
+            await loadActivity(historyPage + 1, true)
+        } finally {
+            setHistoryLoadingMore(false)
         }
     }
 
@@ -722,6 +742,17 @@ function FindSizePage() {
                                 </article>
                             ))}
                         </div>
+                    )}
+                    {historyHasMore && (
+                        <button
+                            type="button"
+                            className="primary-button"
+                            onClick={handleLoadMoreHistory}
+                            disabled={historyLoadingMore}
+                            style={{ marginTop: '18px' }}
+                        >
+                            {historyLoadingMore ? 'Loading...' : 'Load more'}
+                        </button>
                     )}
                 </section>
             </section>
