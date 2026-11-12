@@ -213,6 +213,7 @@ public class RecommendationService {
                         .userId(user.getId())
                         .productId(product.getId())
                         .brandId(brand.getId())
+                        .category(product.getCategory())
 
                         // Null when a product-specific spec was used.
                         .sizeChartId(source.getSizeChartId())

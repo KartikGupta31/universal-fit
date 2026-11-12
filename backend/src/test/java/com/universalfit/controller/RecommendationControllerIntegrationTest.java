@@ -2,6 +2,7 @@ package com.universalfit.controller;
 
 import com.universalfit.AbstractMongoIntegrationTest;
 import com.universalfit.domain.model.FitRecommendation;
+import com.universalfit.domain.enums.Category;
 import com.universalfit.security.CustomUserDetailsService;
 import com.universalfit.security.JwtUtil;
 import com.universalfit.service.RecommendationService;
@@ -44,6 +45,44 @@ class RecommendationControllerIntegrationTest extends AbstractMongoIntegrationTe
                 .build();
         Mockito.when(customUserDetailsService.loadUserByUsername("user@example.com"))
                 .thenReturn(user);
+    }
+
+
+    @Test
+    @DisplayName("Brand and category recommendation route reaches the category service")
+    void brandCategoryRequest() throws Exception {
+        ObjectId brandId = new ObjectId();
+        String token = jwtUtil.generateAccessToken("user@example.com");
+        FitRecommendation expected = FitRecommendation.builder()
+                .recommendedSize("M").confidence(0.8).reason("Category test").build();
+
+        Mockito.when(recommendationService.recommendByBrandAndCategory(
+                eq("user@example.com"), eq(brandId), eq(Category.JEANS), eq("IN")))
+                .thenReturn(expected);
+
+        mockMvc.perform(post("/api/recommendations/brand/" + brandId.toHexString() + "/category/JEANS")
+                        .param("region", "IN")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+
+        Mockito.verify(recommendationService).recommendByBrandAndCategory(
+                "user@example.com", brandId, Category.JEANS, "IN");
+    }
+
+    @Test
+    @DisplayName("Brand and category route rejects invalid brand IDs")
+    void invalidBrandIdForCategoryRoute() throws Exception {
+        String token = jwtUtil.generateAccessToken("user@example.com");
+        mockMvc.perform(post("/api/recommendations/brand/not-an-id/category/JEANS")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Brand and category route requires authentication")
+    void categoryRouteRequiresAuthentication() throws Exception {
+        mockMvc.perform(post("/api/recommendations/brand/" + new ObjectId().toHexString() + "/category/JEANS"))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
