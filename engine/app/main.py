@@ -11,25 +11,47 @@ from fastapi.responses import JSONResponse
 from .models import RecommendRequest, Recommendation
 from .scoring import recommend
 
+
 logger = logging.getLogger("universalfit.engine")
 
 app = FastAPI(
     title="Universal Fit Recommendation Engine",
     version="0.1.0",
-    description="Deterministic, explainable size scoring. Called by the Spring Boot backend.",
+    description="Recommendation engine for Universal Fit.",
 )
 
 
-def _safe_validation_errors(exc: RequestValidationError) -> list:
-    """Return validation locations and types without exposing submitted values."""
-    return [
-        {
-            "loc": [str(part) for part in err.get("loc", ())],
-            "msg": "Invalid request data",
-            "type": str(err.get("type", "")),
-        }
-        for err in exc.errors()
-    ]
+def require_api_key(
+    x_api_key: Optional[str] = Header(default=None, alias="X-API-Key"),
+) -> None:
+    expected_key = os.getenv("ENGINE_API_KEY")
+
+    if not expected_key:
+        return
+
+    if not x_api_key or not hmac.compare_digest(x_api_key, expected_key):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or missing API key.",
+        )
+
+
+def _safe_validation_errors(exc: RequestValidationError) -> list[dict]:
+    safe_errors = []
+
+    for error in exc.errors():
+        location = error.get("loc", ())
+        error_type = error.get("type", "validation_error")
+
+        safe_errors.append(
+            {
+                "loc": [str(part) for part in location],
+                "msg": "Invalid request data",
+                "type": str(error_type),
+            }
+        )
+
+    return safe_errors
 
 
 @app.exception_handler(RequestValidationError)
@@ -39,32 +61,47 @@ async def validation_error_handler(
 ) -> JSONResponse:
     errors = _safe_validation_errors(exc)
 
-    for err in errors:
+    # Inspect only metadata. Never log request values or measurements.
+    body = exc.body
+
+    if isinstance(body, (bytes, bytearray)):
+        body_type = "bytes"
+        body_size = len(body)
+        body_keys = []
+    elif isinstance(body, dict):
+        body_type = "object"
+        body_size = None
+        body_keys = sorted(str(key) for key in body.keys())
+    elif body is None:
+        body_type = "none"
+        body_size = None
+        body_keys = []
+    else:
+        body_type = type(body).__name__
+        body_size = None
+        body_keys = []
+
+    logger.warning(
+        "Validation body metadata: path=%s body_type=%s "
+        "body_size=%s top_level_keys=%s",
+        request.url.path,
+        body_type,
+        body_size,
+        body_keys,
+    )
+
+    for error in errors:
         logger.warning(
             "Request validation failed: path=%s loc=%s type=%s",
             request.url.path,
-            ".".join(err["loc"]),
-            err["type"],
+            ".".join(error["loc"]),
+            error["type"],
         )
 
     return JSONResponse(
         status_code=422,
         content={"detail": errors},
     )
-
-
-def require_api_key(x_api_key: Optional[str] = Header(default=None)) -> None:
-    """If ENGINE_API_KEY is set, callers must send it. Unset means local development."""
-    expected = os.getenv("ENGINE_API_KEY")
-
-    if not expected:
-        return
-
-    if not x_api_key or not hmac.compare_digest(x_api_key, expected):
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid or missing API key",
-        )
 
 
 @app.get("/health")

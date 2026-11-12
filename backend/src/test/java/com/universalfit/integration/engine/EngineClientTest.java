@@ -14,10 +14,14 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -49,7 +53,12 @@ class EngineClientTest {
         void setUp() {
                 RestClient.Builder builder = RestClient.builder();
                 server = MockRestServiceServer.bindTo(builder).build();
-                client = new EngineClient(builder, "http://engine.test", API_KEY);
+
+                client = new EngineClient(
+                                builder,
+                                new ObjectMapper(),
+                                "http://engine.test",
+                                API_KEY);
 
                 clientLogger = (Logger) LoggerFactory.getLogger(EngineClient.class);
                 logs = new ListAppender<>();
@@ -107,10 +116,8 @@ class EngineClientTest {
 
                 String logged = loggedText();
 
-                // HTTP status is safe to log.
                 assertThat(logged).contains("422");
 
-                // Response body and personal measurements must never appear in logs.
                 assertThat(logged)
                                 .doesNotContain("chest")
                                 .doesNotContain("40.0")
@@ -149,7 +156,11 @@ class EngineClientTest {
 
                 MockRestServiceServer noKeyServer = MockRestServiceServer.bindTo(builder).build();
 
-                EngineClient noKeyClient = new EngineClient(builder, "http://engine.test", "");
+                EngineClient noKeyClient = new EngineClient(
+                                builder,
+                                new ObjectMapper(),
+                                "http://engine.test",
+                                "");
 
                 noKeyServer.expect(requestTo("http://engine.test/v1/recommend"))
                                 .andExpect(request -> assertThat(request.getHeaders().containsKey("X-API-Key"))
