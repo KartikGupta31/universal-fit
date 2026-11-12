@@ -88,6 +88,12 @@ public class RecommendationService {
         Optional<ProductSizeSpec> optionalSpec =
                 productSizeSpecRepository.findByProductId(productId);
 
+        if (optionalSpec.isPresent()
+                && Boolean.FALSE.equals(optionalSpec.get().getRecommendationEligible())) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
+                    "This product's source measurements are retained for reference but are not eligible for size recommendations yet.");
+        }
+
         if (optionalSpec.isPresent()) {
 
             source = new SizingSource(optionalSpec.get(), null);

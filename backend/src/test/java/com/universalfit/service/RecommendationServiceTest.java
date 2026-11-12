@@ -127,6 +127,19 @@ class RecommendationServiceTest {
     }
 
     @Test
+    void rawSourceDimensionsAreNotEligibleForRecommendations() {
+        stubDemoTshirtHappyPath();
+        when(specs.findByProductId(productId)).thenReturn(Optional.of(ProductSizeSpec.builder()
+                .productId(productId).recommendationEligible(false).build()));
+
+        assertThatThrownBy(() -> service.recommend(EMAIL, productId))
+                .isInstanceOfSatisfying(ResponseStatusException.class,
+                        ex -> assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY));
+        verifyNoInteractions(engine);
+        verify(recommendations, never()).save(any());
+    }
+
+    @Test
     void missingConsentIsForbiddenAndNeverReachesTheEngine() {
         stubUser(false);
 
