@@ -703,7 +703,7 @@ function FindSizePage() {
                                 <article className="history-item" key={item.id}>
                                     <div>
                                         <strong>{item.recommendedSize || 'No size recommended'}</strong>
-                                        <span>{item.category?.replaceAll('_', ' ') || 'Category'} · {Math.round((item.confidence || 0) * 100)}% confidence</span>
+                                        <span>{item.brandName || 'Brand'} · {item.category?.replaceAll('_', ' ') || 'Category'} · {Math.round((item.confidence || 0) * 100)}% confidence</span>
                                     </div>
                                     <div className="history-feedback">
                                         {feedbackByRecommendation[item.id] ? feedbackByRecommendation[item.id].feedback.replaceAll('_', ' ') : 'Feedback not submitted'}
