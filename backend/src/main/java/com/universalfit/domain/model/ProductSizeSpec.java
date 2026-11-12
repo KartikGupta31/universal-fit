@@ -9,7 +9,7 @@ import org.springframework.data.annotation.*;
 import org.springframework.data.mongodb.core.index.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-/** Product-specific garment measurements. When present they take precedence over the brand size chart. */
+/** Product-specific body or garment sizing data. The explicit basis determines how measurements are interpreted. */
 @Document("product_size_specs")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class ProductSizeSpec {

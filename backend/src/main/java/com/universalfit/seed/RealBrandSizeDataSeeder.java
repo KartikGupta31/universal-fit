@@ -34,8 +34,9 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         // These brands are catalog entries. Categories are exposed only where source data exists.
-        Brand zara = saveBrand("zara", "Zara", "https://www.zara.com/in/", List.of(),
-                "Official India storefront. No reusable category chart has been imported.");
+        Brand zara = saveBrand("zara", "Zara",
+                "https://www.zara.com/in/en/zara-timeless---contrast-collar-t-shirt-p06061534.html", List.of(),
+                "Official India product pages direct customers to the size guide or to request measurements. Numeric size rows were not available in the accessible official source, so no values were invented.");
         Brand hm = saveBrand("h-and-m", "H&M",
                 "https://www2.hm.com/en_in/customer-service/sizeguide/sizing-faq.html", List.of(),
                 "Two official India T-shirt product tables are retained as raw Width and Length values. The source does not define width axis/flat-vs-circumference, so these records are inactive and excluded from recommendations until verified.");
@@ -224,6 +225,7 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
         spec.setVerificationStatus(VerificationStatus.UNVERIFIED);
         spec.setRecommendationEligible(false);
         spec.setMeasurementNotes("Source publishes Width and Length only; it does not define the width axis or whether it is flat width/circumference. Stored verbatim and excluded from recommendations pending measurement-method verification.");
+        spec.setLastVerifiedAt(null);
         specs.save(spec);
     }
 
@@ -257,6 +259,8 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
         spec.setDataSource(SOURCE);
         spec.setSourceUrl(sourceUrl);
         spec.setVerificationStatus(VerificationStatus.UNVERIFIED);
+        spec.setRecommendationEligible(true);
+        spec.setMeasurementNotes(null);
         spec.setLastVerifiedAt(null);
         specs.save(spec);
     }
