@@ -30,14 +30,24 @@ async function apiRequest(endpoint, options = {}) {
     }
 
     if (!response.ok) {
+        const validationErrors = Array.isArray(data.errors)
+            ? data.errors.map(item => item.defaultMessage || item.message).filter(Boolean).join(', ')
+            : null
+        const errorMessage = [
+            data.detail,
+            data.message,
+            validationErrors,
+            data.title && data.title !== 'Bad Request' ? data.title : null,
+            data.error && data.error !== 'Bad Request' ? data.error : null,
+            typeof data === 'string' ? data : null,
+        ].find(value => typeof value === 'string' && value.trim())
+
         throw new Error(
-            data.detail ||
-            data.message ||
-            (Array.isArray(data.errors) ? data.errors.map(item => item.defaultMessage || item.message).filter(Boolean).join(', ') : null) ||
-            data.error && data.error !== 'Bad Request' ? data.error :
-            `Request failed with status ${response.status}`
+            errorMessage ||
+            (responseText && responseText.trim()
+                ? `Request failed with status ${response.status}: ${responseText}`
+                : `Request failed with status ${response.status}`)
         )
-    }
 
     return data
 }
