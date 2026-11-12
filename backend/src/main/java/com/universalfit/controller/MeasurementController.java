@@ -49,9 +49,33 @@ public class MeasurementController {
                         new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
+    private static final double CM_PER_INCH = 2.54;
+
     /**
-     * Validates body measurements according to the selected unit.
-     * These are broad input sanity limits, not fit recommendations.
+     * Plausible adult bounds in centimetres. MUST match PLAUSIBLE_CM in engine/app/units.py: the engine rejects
+     * (HTTP 422) any saved profile value outside these bounds, so accepting a wider range here would let a user
+     * save a profile that can never produce a recommendation. See contracts/README.md.
+     */
+    private static final Map<String, double[]> PLAUSIBLE_CM = Map.of(
+            "height", new double[]{100.0, 250.0},
+            "chest", new double[]{50.0, 200.0},
+            "waist", new double[]{40.0, 200.0},
+            "hips", new double[]{50.0, 220.0},
+            "shoulder", new double[]{25.0, 80.0},
+            "neck", new double[]{20.0, 70.0},
+            "sleeve", new double[]{40.0, 100.0},
+            "inseam", new double[]{40.0, 120.0},
+            "thigh", new double[]{25.0, 100.0},
+            "footLength", new double[]{15.0, 40.0}
+    );
+
+    /** Weight bounds in kilograms; same as the engine's weight check. Weight is always stored in kg. */
+    private static final double MIN_WEIGHT_KG = 20.0;
+    private static final double MAX_WEIGHT_KG = 300.0;
+
+    /**
+     * Validates a body measurement against the same plausible range the recommendation engine enforces.
+     * Inch values are converted exactly the way the engine converts them (value * 2.54).
      */
     private boolean isValidMeasurement(
             String key, double value, Unit unit) {
@@ -60,40 +84,13 @@ public class MeasurementController {
             return false;
         }
 
-        double min;
-        double max;
-
-        switch (key) {
-            case "height" -> {
-                min = unit == Unit.CM ? 50 : 20;
-                max = unit == Unit.CM ? 250 : 100;
-            }
-            case "chest", "waist", "hips" -> {
-                min = unit == Unit.CM ? 30 : 12;
-                max = unit == Unit.CM ? 200 : 80;
-            }
-            case "shoulder", "neck" -> {
-                min = unit == Unit.CM ? 10 : 4;
-                max = unit == Unit.CM ? 100 : 40;
-            }
-            case "sleeve", "inseam" -> {
-                min = unit == Unit.CM ? 10 : 4;
-                max = unit == Unit.CM ? 150 : 60;
-            }
-            case "thigh" -> {
-                min = unit == Unit.CM ? 15 : 6;
-                max = unit == Unit.CM ? 120 : 48;
-            }
-            case "footLength" -> {
-                min = unit == Unit.CM ? 5 : 2;
-                max = unit == Unit.CM ? 50 : 20;
-            }
-            default -> {
-                return false;
-            }
+        double[] bounds = PLAUSIBLE_CM.get(key);
+        if (bounds == null) {
+            return false;
         }
 
-        return value >= min && value <= max;
+        double cm = unit == Unit.IN ? value * CM_PER_INCH : value;
+        return cm >= bounds[0] && cm <= bounds[1];
     }
 
     // GET: Retrieve current user's measurement profile
@@ -180,13 +177,13 @@ public class MeasurementController {
 
         if (weightKg != null
                 && (!Double.isFinite(weightKg)
-                || weightKg < 1
-                || weightKg > 500)) {
+                || weightKg < MIN_WEIGHT_KG
+                || weightKg > MAX_WEIGHT_KG)) {
 
             return ResponseEntity.badRequest()
                     .body(Map.of(
                             "message",
-                            "Weight must be between 1 and 500 kg"
+                            "Weight must be between 20 and 300 kg"
                     ));
         }
 

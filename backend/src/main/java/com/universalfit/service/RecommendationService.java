@@ -6,6 +6,7 @@ import com.universalfit.domain.model.*;
 import com.universalfit.integration.engine.EngineClient;
 import com.universalfit.integration.engine.EngineDtos;
 import com.universalfit.integration.engine.EngineUnavailableException;
+import com.universalfit.integration.engine.EngineRejectedRequestException;
 import com.universalfit.integration.engine.EngineResponseException;
 import com.universalfit.repository.*;
 
@@ -169,6 +170,12 @@ public class RecommendationService {
             throw new ResponseStatusException(
                     HttpStatus.SERVICE_UNAVAILABLE,
                     "Recommendation engine unavailable");
+        } catch (EngineRejectedRequestException ex) {
+            // The engine rejected the measurements or sizing data (details are logged by EngineClient).
+            throw new ResponseStatusException(
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Your saved measurements or this product's size data could not be processed. "
+                            + "Please review your measurements and try again.");
         } catch (EngineResponseException ex) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_GATEWAY,

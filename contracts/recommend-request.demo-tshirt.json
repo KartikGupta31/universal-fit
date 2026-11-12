@@ -1,0 +1,94 @@
+{
+  "profile": {
+    "unit": "CM",
+    "preferredFit": "REGULAR",
+    "height": 175.0,
+    "weight": 70.0,
+    "chest": 96.0,
+    "waist": 82.0,
+    "hips": null,
+    "shoulder": 44.0,
+    "neck": null,
+    "sleeve": null,
+    "inseam": null,
+    "thigh": null,
+    "footLength": null
+  },
+  "category": "T_SHIRT",
+  "productFitType": "REGULAR",
+  "measurementBasis": "GARMENT",
+  "unit": "CM",
+  "garmentFlat": false,
+  "chartVerified": false,
+  "brandName": "DEMO Alpha Wear",
+  "sizes": [
+    {
+      "label": "S",
+      "measurements": {
+        "chest": {
+          "min": 100.0,
+          "max": 100.0
+        },
+        "waist": {
+          "min": 96.0,
+          "max": 96.0
+        },
+        "shoulder": {
+          "min": 43.0,
+          "max": 43.0
+        }
+      }
+    },
+    {
+      "label": "M",
+      "measurements": {
+        "chest": {
+          "min": 106.0,
+          "max": 106.0
+        },
+        "waist": {
+          "min": 102.0,
+          "max": 102.0
+        },
+        "shoulder": {
+          "min": 45.0,
+          "max": 45.0
+        }
+      }
+    },
+    {
+      "label": "L",
+      "measurements": {
+        "chest": {
+          "min": 112.0,
+          "max": 112.0
+        },
+        "waist": {
+          "min": 108.0,
+          "max": 108.0
+        },
+        "shoulder": {
+          "min": 47.0,
+          "max": 47.0
+        }
+      }
+    },
+    {
+      "label": "XL",
+      "measurements": {
+        "chest": {
+          "min": 118.0,
+          "max": 118.0
+        },
+        "waist": {
+          "min": 114.0,
+          "max": 114.0
+        },
+        "shoulder": {
+          "min": 49.0,
+          "max": 49.0
+        }
+      }
+    }
+  ]
+}
