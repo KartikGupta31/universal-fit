@@ -1,6 +1,6 @@
-
 import { Link, NavLink } from 'react-router-dom'
 import { UserRound, Menu } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
 import './Navbar.css'
 
 const links = [
@@ -11,6 +11,8 @@ const links = [
 ]
 
 function Navbar() {
+    const { isAuthenticated, isAdmin } = useAuth()
+
     return (
         <header className="navbar">
             <Link to="/" className="navbar-logo">
@@ -31,11 +33,28 @@ function Navbar() {
             </nav>
 
             <div className="navbar-actions">
-                <Link to="/login" className="login-link">LOG IN</Link>
-                <Link to="/register" className="profile-button">
-                    <UserRound size={16} />
-                    <span>GET STARTED</span>
-                </Link>
+                {isAdmin && (
+                    <NavLink
+                        to="/admin"
+                        className={({ isActive }) => isActive ? 'nav-link admin-nav-link active' : 'nav-link admin-nav-link'}
+                    >
+                        ADMIN DASHBOARD
+                    </NavLink>
+                )}
+                {!isAuthenticated ? (
+                    <>
+                        <Link to="/login" className="login-link">LOG IN</Link>
+                        <Link to="/register" className="profile-button">
+                            <UserRound size={16} />
+                            <span>GET STARTED</span>
+                        </Link>
+                    </>
+                ) : (
+                    <span className="account-status">
+                        <UserRound size={16} />
+                        <span>{isAdmin ? 'ADMIN' : 'ACCOUNT'}</span>
+                    </span>
+                )}
             </div>
 
             <button className="mobile-menu" aria-label="Menu">
