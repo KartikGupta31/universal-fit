@@ -9,6 +9,9 @@ import {
 import {
     getBrands,
     getCategoryRecommendation,
+    getRecommendationHistory,
+    getFitFeedback,
+    submitFitFeedback,
 } from '../services/recommendationService'
 import './FindSizePage.css'
 
@@ -58,6 +61,13 @@ function FindSizePage() {
     const [catalogLoading, setCatalogLoading] = useState(false)
     const [recommending, setRecommending] = useState(false)
     const [recommendation, setRecommendation] = useState(null)
+    const [history, setHistory] = useState([])
+    const [feedbackByRecommendation, setFeedbackByRecommendation] = useState({})
+    const [feedbackChoice, setFeedbackChoice] = useState('')
+    const [purchasedSize, setPurchasedSize] = useState('')
+    const [feedbackComments, setFeedbackComments] = useState('')
+    const [feedbackSaving, setFeedbackSaving] = useState(false)
+    const [feedbackSuccess, setFeedbackSuccess] = useState('')
 
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
@@ -89,6 +99,22 @@ function FindSizePage() {
         }
     }
 
+    async function loadActivity() {
+        try {
+            const [historyData, feedbackData] = await Promise.all([
+                getRecommendationHistory(0, 10), getFitFeedback(0, 50),
+            ])
+            setHistory(historyData?.content || [])
+            const map = {}
+            ;(feedbackData?.content || []).forEach(item => {
+                if (item.recommendationId) map[item.recommendationId] = item
+            })
+            setFeedbackByRecommendation(map)
+        } catch (err) {
+            setError(`Could not load recommendation history: ${err.message}`)
+        }
+    }
+
     async function loadCatalog() {
         setCatalogLoading(true)
 
@@ -115,7 +141,7 @@ function FindSizePage() {
 
                 if (user.measurementConsent) {
                     await loadProfile()
-                    if (active) await loadCatalog()
+                    if (active) { await loadCatalog(); await loadActivity() }
                 }
             } catch (err) {
                 if (active) setError(err.message)
@@ -140,6 +166,7 @@ function FindSizePage() {
             setConsent(true)
             await loadProfile()
             await loadCatalog()
+            await loadActivity()
         } catch (err) {
             setError(err.message)
         } finally {
@@ -251,10 +278,39 @@ function FindSizePage() {
         try {
             const result = await getCategoryRecommendation(selectedBrand, selectedCategory, selectedRegion, selectedSizingSystem)
             setRecommendation(result)
+            setFeedbackChoice('')
+            setPurchasedSize('')
+            setFeedbackComments('')
+            setFeedbackSuccess('')
+            await loadActivity()
         } catch (err) {
             setError(err.message)
         } finally {
             setRecommending(false)
+        }
+    }
+
+    async function handleFeedbackSubmit(event) {
+        event.preventDefault()
+        if (!recommendation?.id || !feedbackChoice) return
+        setFeedbackSaving(true)
+        setError('')
+        setFeedbackSuccess('')
+        try {
+            const saved = await submitFitFeedback({
+                recommendationId: recommendation.id, feedback: feedbackChoice,
+                purchasedSize: purchasedSize.trim() || null,
+                comments: feedbackComments.trim() || null,
+            })
+            setFeedbackByRecommendation(current => ({ ...current, [recommendation.id]: saved }))
+            setFeedbackSuccess('Thank you. Your fit feedback has been saved.')
+            setFeedbackChoice('')
+            setPurchasedSize('')
+            setFeedbackComments('')
+        } catch (err) {
+            setError(err.message)
+        } finally {
+            setFeedbackSaving(false)
         }
     }
 
@@ -605,8 +661,59 @@ function FindSizePage() {
                         <p className="chart-verification">
                             Size chart: {recommendation.chartVerified ? 'Verified' : 'Not verified'}
                         </p>
+                        <div className="result-detail">
+                            <h3>How did this size fit?</h3>
+                            {feedbackByRecommendation[recommendation.id] ? (
+                                <p className="form-success">Feedback submitted: {feedbackByRecommendation[recommendation.id].feedback.replaceAll('_', ' ').toLowerCase()}.</p>
+                            ) : recommendation.id ? (
+                                <form className="fit-feedback-form" onSubmit={handleFeedbackSubmit}>
+                                    <label className="product-select-label">Your fit experience
+                                        <select value={feedbackChoice} onChange={event => setFeedbackChoice(event.target.value)} required>
+                                            <option value="">Choose feedback</option>
+                                            <option value="PERFECT_FIT">Perfect fit</option>
+                                            <option value="TOO_TIGHT">Too tight</option>
+                                            <option value="TOO_LOOSE">Too loose</option>
+                                            <option value="TOO_SHORT">Too short</option>
+                                            <option value="TOO_LONG">Too long</option>
+                                        </select>
+                                    </label>
+                                    <label className="product-select-label">Size you purchased (optional)
+                                        <input value={purchasedSize} onChange={event => setPurchasedSize(event.target.value)} maxLength={30} placeholder="e.g. M" />
+                                    </label>
+                                    <label className="product-select-label">Additional comments (optional)
+                                        <textarea value={feedbackComments} onChange={event => setFeedbackComments(event.target.value)} maxLength={500} rows={3} placeholder="Tell us about the fit..." />
+                                    </label>
+                                    <button className="primary-button" type="submit" disabled={feedbackSaving || !feedbackChoice}>
+                                        {feedbackSaving ? 'Saving feedback...' : 'Submit feedback'}
+                                    </button>
+                                    {feedbackSuccess && <p className="form-success">{feedbackSuccess}</p>}
+                                </form>
+                            ) : <p>Feedback is unavailable because this response has no saved recommendation ID.</p>}
+                        </div>
                     </section>
                 )}
+
+                <section className="measurement-section recommendation-history">
+                    <p className="eyebrow">YOUR ACTIVITY</p>
+                    <h2>Recommendation history</h2>
+                    <p className="section-description">Your latest size recommendations and submitted fit feedback.</p>
+                    {history.length === 0 ? <p className="section-description">Your recommendation history will appear here after your first result.</p> : (
+                        <div className="history-list">
+                            {history.map(item => (
+                                <article className="history-item" key={item.id}>
+                                    <div>
+                                        <strong>{item.recommendedSize || 'No size recommended'}</strong>
+                                        <span>{item.category?.replaceAll('_', ' ') || 'Category'} · {Math.round((item.confidence || 0) * 100)}% confidence</span>
+                                    </div>
+                                    <div className="history-feedback">
+                                        {feedbackByRecommendation[item.id] ? feedbackByRecommendation[item.id].feedback.replaceAll('_', ' ') : 'Feedback not submitted'}
+                                    </div>
+                                    <small>{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : ''}</small>
+                                </article>
+                            ))}
+                        </div>
+                    )}
+                </section>
             </section>
         </main>
     )

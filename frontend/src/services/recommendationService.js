@@ -59,3 +59,15 @@ export async function getRecommendation(productId) {
         method: 'POST',
     })
 }
+
+export async function getRecommendationHistory(page = 0, size = 10) {
+    return apiRequest(`/recommendations/history?page=${page}&size=${size}`)
+}
+
+export async function getFitFeedback(page = 0, size = 50) {
+    return apiRequest(`/feedback?page=${page}&size=${size}`)
+}
+
+export async function submitFitFeedback(payload) {
+    return apiRequest('/feedback', { method: 'POST', body: JSON.stringify(payload) })
+}

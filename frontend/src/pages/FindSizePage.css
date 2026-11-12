@@ -518,3 +518,14 @@
     font-size: 13px;
     line-height: 1.7;
 }
+
+.fit-feedback-form { display: grid; gap: 16px; max-width: 560px; margin-top: 18px; }
+.fit-feedback-form input, .fit-feedback-form textarea { width: 100%; padding: 13px; border: 1px solid #d8d1c7; background: #fff; color: #24211e; font: inherit; border-radius: 4px; }
+.recommendation-history { margin-top: 38px; }
+.history-list { display: grid; gap: 12px; margin-top: 20px; }
+.history-item { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 18px; border: 1px solid #e6e1d9; background: #fff; }
+.history-item > div:first-child { display: grid; gap: 6px; }
+.history-item strong { font-family: Georgia, serif; font-size: 22px; font-weight: 400; }
+.history-item span, .history-item small, .history-feedback { color: #777168; font-size: 12px; }
+.history-feedback { text-transform: capitalize; }
+@media (max-width: 600px) { .history-item { align-items: flex-start; flex-direction: column; } }
