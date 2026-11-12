@@ -4,6 +4,11 @@ import { ArrowUpRight, Search, Ruler, ShieldCheck, AlertCircle } from 'lucide-re
 import { getBrands } from '../services/recommendationService'
 import './DiscoveryPages.css'
 
+const brandDomains = {
+    'Zara': 'zara.com', 'H&M': 'hm.com', 'UNIQLO': 'uniqlo.com', "Levi's": 'levi.com',
+    'Nike': 'nike.com', 'adidas': 'adidas.com', 'PUMA': 'puma.com', 'GAP': 'gap.com',
+    'Tommy Hilfiger': 'tommy.com', 'Demo Brand': null,
+}
 const categoryLabels = { T_SHIRT: 'T-shirts', SHIRT: 'Shirts', JEANS: 'Jeans', TROUSERS: 'Trousers', JACKET: 'Jackets', HOODIE: 'Hoodies', DRESS: 'Dresses', TOP: 'Tops' }
 
 function BrandsPage() {
@@ -61,8 +66,11 @@ function BrandsPage() {
                         const ready = supported.length > 0
                         return (
                             <article className="brand-directory-card" key={brand.id}>
-                                <div className="brand-card-top"><span className="brand-monogram">{brand.name.slice(0, 1).toUpperCase()}</span><span className={ready ? 'data-pill data-ready' : 'data-pill data-pending'}>{ready ? 'CATEGORIES AVAILABLE' : 'DATA IN PROGRESS'}</span></div>
-                                <h3>{brand.name}</h3>
+                                <div className="brand-card-top"><span className="brand-logo-wrap">
+                                    {brandDomains[brand.name] ? <img className="brand-logo" src={`https://www.google.com/s2/favicons?domain=${brandDomains[brand.name]}&sz=128`} alt={`${brand.name} logo`} loading="lazy" onError={event => { event.currentTarget.style.display = 'none'; event.currentTarget.nextElementSibling.style.display = 'grid' }} /> : null}
+                                    <span className="brand-logo-fallback" style={{ display: brandDomains[brand.name] ? 'none' : 'grid' }}>{brand.name.slice(0, 1).toUpperCase()}</span>
+                                </span><span className={ready ? 'data-pill data-ready' : 'data-pill data-pending'}>{ready ? 'CATEGORIES AVAILABLE' : 'DATA IN PROGRESS'}</span></div>
+                                <h3 className="brand-card-name">{brand.name}</h3>
                                 <p className="brand-origin">{brand.country ? `Origin: ${brand.country}` : 'Brand sizing directory'}</p>
                                 <div className="brand-card-divider" />
                                 <p className="brand-card-label">SUPPORTED CATEGORIES</p>
