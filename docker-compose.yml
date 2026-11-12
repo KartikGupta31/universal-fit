@@ -51,6 +51,7 @@ services:
       MONGODB_URI: mongodb://mongo:27017/universalfit
       ENGINE_BASE_URL: http://engine:8000
       REDIS_URL: redis://redis:6379
+      SEED_REAL_BRAND_DATA: ${SEED_REAL_BRAND_DATA:-false}
     depends_on:
       mongo:
         condition: service_healthy
