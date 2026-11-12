@@ -31,8 +31,10 @@ async function apiRequest(endpoint, options = {}) {
 
     if (!response.ok) {
         throw new Error(
+            data.detail ||
             data.message ||
-            data.error ||
+            (Array.isArray(data.errors) ? data.errors.map(item => item.defaultMessage || item.message).filter(Boolean).join(', ') : null) ||
+            data.error && data.error !== 'Bad Request' ? data.error :
             `Request failed with status ${response.status}`
         )
     }
