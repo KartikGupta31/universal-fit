@@ -68,6 +68,7 @@ function FindSizePage() {
     const [feedbackComments, setFeedbackComments] = useState('')
     const [feedbackSaving, setFeedbackSaving] = useState(false)
     const [feedbackSuccess, setFeedbackSuccess] = useState('')
+    const [feedbackError, setFeedbackError] = useState('')
 
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
@@ -292,9 +293,16 @@ function FindSizePage() {
 
     async function handleFeedbackSubmit(event) {
         event.preventDefault()
-        if (!recommendation?.id || !feedbackChoice) return
+        if (!recommendation?.id) {
+            setFeedbackError('This recommendation has no saved ID. Please generate a new recommendation and try again.')
+            return
+        }
+        if (!feedbackChoice) {
+            setFeedbackError('Please select your fit experience.')
+            return
+        }
         setFeedbackSaving(true)
-        setError('')
+        setFeedbackError('')
         setFeedbackSuccess('')
         try {
             const saved = await submitFitFeedback({
@@ -304,11 +312,12 @@ function FindSizePage() {
             })
             setFeedbackByRecommendation(current => ({ ...current, [recommendation.id]: saved }))
             setFeedbackSuccess('Thank you. Your fit feedback has been saved.')
+            await loadActivity()
             setFeedbackChoice('')
             setPurchasedSize('')
             setFeedbackComments('')
         } catch (err) {
-            setError(err.message)
+            setFeedbackError(err.message || 'Could not save your feedback. Please try again.')
         } finally {
             setFeedbackSaving(false)
         }
@@ -686,7 +695,8 @@ function FindSizePage() {
                                     <button className="primary-button" type="submit" disabled={feedbackSaving || !feedbackChoice}>
                                         {feedbackSaving ? 'Saving feedback...' : 'Submit feedback'}
                                     </button>
-                                    {feedbackSuccess && <p className="form-success">{feedbackSuccess}</p>}
+                                    {feedbackError && <p className="form-error" role="alert">{feedbackError}</p>}
+                                    {feedbackSuccess && <p className="form-success" role="status">{feedbackSuccess}</p>}
                                 </form>
                             ) : <p>Feedback is unavailable because this response has no saved recommendation ID.</p>}
                         </div>
