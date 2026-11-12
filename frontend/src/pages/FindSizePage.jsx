@@ -53,7 +53,7 @@ function FindSizePage() {
     const [brands, setBrands] = useState([])
     const [selectedBrand, setSelectedBrand] = useState('')
     const [selectedCategory, setSelectedCategory] = useState('')
-    const [selectedSizingSystem, setSelectedSizingSystem] = useState('MEN')
+    const [selectedSizingSystem, setSelectedSizingSystem] = useState('UNISEX')
     const [selectedRegion, setSelectedRegion] = useState('')
     const [catalogLoading, setCatalogLoading] = useState(false)
     const [recommending, setRecommending] = useState(false)
@@ -260,7 +260,7 @@ function FindSizePage() {
 
     const selectedBrandData = brands.find(brand => brand.id === selectedBrand)
     const supportedCategories = selectedBrandData?.categories || []
-    const supportedSizingSystems = selectedBrandData?.sizingSystemsByCategory?.[selectedCategory] || ['MEN', 'WOMEN']
+    const supportedSizingSystems = selectedBrandData?.sizingSystemsByCategory?.[selectedCategory] || ['UNISEX']
     const categoryLabels = { T_SHIRT: 'T-shirts', SHIRT: 'Shirts', JEANS: 'Jeans', TROUSERS: 'Trousers', JACKET: 'Jackets', HOODIE: 'Hoodies', DRESS: 'Dresses', TOP: 'Tops' }
 
     if (loading) {
@@ -479,7 +479,7 @@ function FindSizePage() {
                             <div className="selection-grid">
                                 <label className="product-select-label">Choose a brand
                                     <select value={selectedBrand} onChange={event => {
-                                        setSelectedBrand(event.target.value); setSelectedCategory(''); setSelectedSizingSystem('MEN'); setSelectedRegion('');
+                                        setSelectedBrand(event.target.value); setSelectedCategory(''); setSelectedSizingSystem('UNISEX'); setSelectedRegion('');
                                         setRecommendation(null); setError('');
                                     }}>
                                         <option value="">Select a brand</option>
@@ -488,7 +488,7 @@ function FindSizePage() {
                                 </label>
                                 <label className="product-select-label">Choose a category
                                     <select value={selectedCategory} disabled={!selectedBrand} onChange={event => {
-                                        setSelectedCategory(event.target.value); setSelectedSizingSystem((selectedBrandData?.sizingSystemsByCategory?.[event.target.value] || ['MEN', 'WOMEN'])[0]); setRecommendation(null); setError('');
+                                        setSelectedCategory(event.target.value); setSelectedSizingSystem((selectedBrandData?.sizingSystemsByCategory?.[event.target.value] || ['UNISEX'])[0]); setRecommendation(null); setError('');
                                     }}>
                                         <option value="">Select a category</option>
                                         {supportedCategories.map(category => <option key={category} value={category}>{categoryLabels[category] || category.replaceAll('_', ' ')}</option>)}
