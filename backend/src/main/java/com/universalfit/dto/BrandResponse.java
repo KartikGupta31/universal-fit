@@ -21,7 +21,8 @@ public record BrandResponse(
         String dataSource,
         VerificationStatus verificationStatus,
         Instant lastVerifiedAt,
-        String notes
+        String notes,
+        boolean active
 ) {
     public static BrandResponse from(Brand b) {
         return new BrandResponse(
