@@ -484,21 +484,21 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                 waistMin * 2.54, waistMax * 2.54, hipMin * 2.54, hipMax * 2.54);
     }
 
-    private static SizeEntry garmentInchesRow(String label, Double chest, Double shoulder,
-                                              Double length, Double sleeve) {
-        return garmentCmRow(label, chest == null ? null : chest * 2.54,
-                shoulder == null ? null : shoulder * 2.54,
-                length == null ? null : length * 2.54,
-                sleeve == null ? null : sleeve * 2.54);
+    private static SizeEntry garmentInchesRow(String label, Number chest, Number shoulder,
+                                              Number length, Number sleeve) {
+        return garmentCmRow(label, chest == null ? null : chest.doubleValue() * 2.54,
+                shoulder == null ? null : shoulder.doubleValue() * 2.54,
+                length == null ? null : length.doubleValue() * 2.54,
+                sleeve == null ? null : sleeve.doubleValue() * 2.54);
     }
 
-    private static SizeEntry garmentCmRow(String label, Double chest, Double shoulder,
-                                          Double length, Double sleeve) {
+    private static SizeEntry garmentCmRow(String label, Number chest, Number shoulder,
+                                          Number length, Number sleeve) {
         Map<String, MeasurementRange> m = new LinkedHashMap<>();
-        if (chest != null) m.put("chest", MeasurementRange.of(chest));
-        if (shoulder != null) m.put("shoulder", MeasurementRange.of(shoulder));
-        if (length != null) m.put("length", MeasurementRange.of(length));
-        if (sleeve != null) m.put("sleeve", MeasurementRange.of(sleeve));
+        if (chest != null) m.put("chest", MeasurementRange.of(chest.doubleValue()));
+        if (shoulder != null) m.put("shoulder", MeasurementRange.of(shoulder.doubleValue()));
+        if (length != null) m.put("length", MeasurementRange.of(length.doubleValue()));
+        if (sleeve != null) m.put("sleeve", MeasurementRange.of(sleeve.doubleValue()));
         return new SizeEntry(label, m);
     }
 
