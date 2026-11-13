@@ -11,6 +11,7 @@ import AdminCatalogPage from './pages/AdminCatalogPage'
 import BrandsPage from './pages/BrandsPage'
 import ComparePage from './pages/ComparePage'
 import SizeGuidePage from './pages/SizeGuidePage'
+import AccountPage from './pages/AccountPage'
 
 function PlaceholderPage({ title }) {
   return (
@@ -42,6 +43,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
 
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/account" element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />
           <Route path="/register" element={<RegisterPage />} />
 
           <Route
