@@ -282,8 +282,8 @@ function FindSizePage() {
     }
 
     async function handleRecommendation() {
-        if (!selectedBrand || !selectedCategory) {
-            setError('Please select a brand and clothing category first.')
+        if (!selectedBrand || !selectedCategory || !selectedSizingSystem || !selectedRegion) {
+            setError('Please select a brand, category, sizing system and region first.')
             return
         }
 
@@ -564,8 +564,13 @@ function FindSizePage() {
                             <div className="selection-grid">
                                 <label className="product-select-label">Choose a brand
                                     <select value={selectedBrand} onChange={event => {
-                                        setSelectedBrand(event.target.value); setSelectedCategory(''); setSelectedSizingSystem(''); setSelectedRegion('');
-                                        setRecommendation(null); setError('');
+                                        const nextBrand = brands.find(item => item.id === event.target.value);
+                                        setSelectedBrand(event.target.value);
+                                        setSelectedCategory('');
+                                        setSelectedSizingSystem('');
+                                        setSelectedRegion(nextBrand?.supportedRegions?.[0] || '');
+                                        setRecommendation(null);
+                                        setError('');
                                     }}>
                                         <option value="">Select a brand</option>
                                         {brands.map(brand => <option key={brand.id} value={brand.id}>{brand.name}</option>)}
@@ -590,12 +595,12 @@ function FindSizePage() {
                                                 {selectedCategory && supportedSizingSystems.map(system => <option key={system} value={system}>{system === 'MEN' ? 'Men' : system === 'WOMEN' ? 'Women' : 'Unisex'}</option>)}
                                             </select>
                                         </label>
-                                        {selectedBrandData?.supportedRegions?.length > 1 && (
+                                        {(selectedBrandData?.supportedRegions || []).length > 0 && (
                                             <label className="product-select-label">Sizing region
                                                 <select value={selectedRegion} onChange={event => {
-                                                    setSelectedRegion(event.target.value); setRecommendation(null);
+                                                    setSelectedRegion(event.target.value); setRecommendation(null); setError('');
                                                 }}>
-                                                    <option value="">Auto-detect region</option>
+                                                    <option value="">Select a region</option>
                                                     {selectedBrandData.supportedRegions.map(region => <option key={region} value={region}>{region}</option>)}
                                                 </select>
                                             </label>
