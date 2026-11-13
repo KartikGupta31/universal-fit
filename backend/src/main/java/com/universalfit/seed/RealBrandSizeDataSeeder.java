@@ -180,6 +180,69 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                     jeans("29",92.71,64.77,39.37), jeans("30",95.89,66.04,40.01),
                     jeans("31",98.43,67.31,40.64), jeans("32",101.60,68.91,41.28),
                     jeans("33",104.14,70.18,41.91), jeans("34",107.32,71.44,42.55)));
+
+        // Official Onitsuka Tiger India BODY SIZE guide. Only tops are enabled:
+        // the guide is general clothing sizing, not separate numeric charts per category.
+        Brand onitsuka = saveBrand("onitsuka-tiger", "Onitsuka Tiger",
+                "https://www.onitsukatiger.com/in/en-in/clothing-size-guide",
+                List.of(Category.T_SHIRT),
+                "Official India clothing size guide. Separate men's/unisex and women's body-size rows in cm. Coverage is limited to tops; values remain UNVERIFIED pending administrator review.");
+        onitsuka.setSizingSystemsByCategory(Map.of(
+                Category.T_SHIRT, List.of(SizingSystem.MEN, SizingSystem.WOMEN)));
+        brands.save(onitsuka);
+        productInRegion(onitsuka, "Men's / Unisex Clothing Size Guide", SizingSystem.MEN,
+                "https://www.onitsukatiger.com/in/en-in/clothing-size-guide",
+                List.of(
+                    bodyEntry("XS",78,66,78,41.4), bodyEntry("S",84,72,84,42.6),
+                    bodyEntry("M",90,78,90,43.8), bodyEntry("L",96,84,96,45.0),
+                    bodyEntry("XL",102,90,102,46.2)));
+        productInRegion(onitsuka, "Women's Clothing Size Guide", SizingSystem.WOMEN,
+                "https://www.onitsukatiger.com/in/en-in/clothing-size-guide",
+                List.of(
+                    bodyEntry("XS",75,59,83,37), bodyEntry("S",79,63,87,38),
+                    bodyEntry("M",83,67,91,39), bodyEntry("L",87,71,95,40),
+                    bodyEntry("XL",91,75,99,41)));
+    }
+
+    private void productInRegion(Brand brand, String name, SizingSystem sizingSystem,
+                                 String sourceUrl, List<SizeEntry> sizes) {
+        String productUrl = sourceUrl + "#" + sizingSystem.name();
+        Product product = products.findByProductUrl(productUrl).orElseGet(Product::new);
+        product.setName(name);
+        product.setBrandId(brand.getId());
+        product.setCategory(Category.T_SHIRT);
+        product.setSizingSystem(sizingSystem);
+        product.setRegion("IN");
+        product.setProductUrl(productUrl);
+        product.setFitType(FitPreference.REGULAR);
+        product.setAvailableSizes(sizes.stream().map(SizeEntry::getLabel).toList());
+        product.setDataSource("Official Onitsuka Tiger India clothing size guide");
+        product.setVerificationStatus(VerificationStatus.UNVERIFIED);
+        product.setActive(true);
+        product = products.save(product);
+
+        ProductSizeSpec spec = specs.findByProductId(product.getId()).orElseGet(ProductSizeSpec::new);
+        spec.setProductId(product.getId());
+        spec.setMeasurementBasis(MeasurementBasis.BODY);
+        spec.setUnit(Unit.CM);
+        spec.setGarmentFlat(false);
+        spec.setSizes(sizes);
+        spec.setDataSource("Official Onitsuka Tiger India clothing size guide");
+        spec.setSourceUrl(sourceUrl);
+        spec.setVerificationStatus(VerificationStatus.UNVERIFIED);
+        spec.setRecommendationEligible(true);
+        spec.setMeasurementNotes("Official body-size table in cm. Chest, waist, hips and shoulder values are body measurements.");
+        spec.setLastVerifiedAt(null);
+        specs.save(spec);
+    }
+
+    private static SizeEntry bodyEntry(String label, double chest, double waist, double hips, double shoulder) {
+        Map<String, MeasurementRange> m = new LinkedHashMap<>();
+        m.put("chest", MeasurementRange.of(chest));
+        m.put("waist", MeasurementRange.of(waist));
+        m.put("hips", MeasurementRange.of(hips));
+        m.put("shoulder", MeasurementRange.of(shoulder));
+        return new SizeEntry(label, m);
     }
 
     private Brand saveBrand(String slug, String name, String officialUrl,
