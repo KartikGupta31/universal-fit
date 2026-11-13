@@ -281,7 +281,7 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
         product.setBrandId(brand.getId());
         product.setCategory(category);
         product.setSizingSystem(sizingSystem);
-        product.setRegion(region);
+        product.setRegion("IN");
         product.setProductUrl(sourceUrl);
         product.setFitType(fit);
         product.setAvailableSizes(sizes.stream().map(SizeEntry::getLabel).toList());
@@ -322,7 +322,7 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
         product.setBrandId(brand.getId());
         product.setCategory(category);
         product.setSizingSystem(sizingSystem);
-        product.setRegion("IN");
+        product.setRegion(region);
         product.setProductUrl(sourceUrl);
         product.setFitType(fit);
         product.setAvailableSizes(sizes.stream().map(SizeEntry::getLabel).toList());
