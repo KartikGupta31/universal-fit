@@ -238,7 +238,7 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
         adidas.setSupportedRegions(List.of("US"));
         adidas.setSizingSystemsByCategory(Map.of(
                 Category.T_SHIRT, List.of(SizingSystem.MEN, SizingSystem.WOMEN),
-                Category.TROUSERS, List.of(SizingSystem.WOMEN)));
+                Category.TROUSERS, List.of(SizingSystem.MEN, SizingSystem.WOMEN)));
         brands.save(adidas);
         product(adidas, "Men's Shirts & Tops (US Sizing)", Category.T_SHIRT, SizingSystem.MEN,
                 url, FitPreference.REGULAR, MeasurementBasis.BODY, "US",
@@ -263,6 +263,14 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                     bodyBottomRow("S",67,72,92,97,78.5), bodyBottomRow("M",73,78,98,103,79),
                     bodyBottomRow("L",79,85,104,110,79.5), bodyBottomRow("XL",86,94,111,117,80),
                     bodyBottomRow("2XL",95,104,118,125,80.5)));
+        String menBottomsUrl = "https://www.adidas.com/us/help/size_charts/men-pants_shorts";
+        product(adidas, "Men's Pants & Shorts (US Sizing)", Category.TROUSERS, SizingSystem.MEN,
+                menBottomsUrl, FitPreference.REGULAR, MeasurementBasis.BODY, "US",
+                List.of(
+                    bodyBottomRow("XS Short",71,74,82,85,76), bodyBottomRow("S Short",75,80,86,91,76.5),
+                    bodyBottomRow("M Short",81,88,92,99,77), bodyBottomRow("L Short",89,96,100,107,77.5),
+                    bodyBottomRow("XL Short",97,106,108,116,78), bodyBottomRow("2XL Short",107,119,117,125,77.5),
+                    bodyBottomRow("3XL Short",120,132,126,135,77)));
     }
 
     private void seedPuma() {
