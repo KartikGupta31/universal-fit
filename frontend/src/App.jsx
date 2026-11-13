@@ -12,6 +12,7 @@ import BrandsPage from './pages/BrandsPage'
 import ComparePage from './pages/ComparePage'
 import SizeGuidePage from './pages/SizeGuidePage'
 import AccountPage from './pages/AccountPage'
+import HowItWorksPage from './pages/HowItWorksPage'
 
 function PlaceholderPage({ title }) {
   return (
@@ -60,7 +61,7 @@ function App() {
           <Route path="/brands" element={<BrandsPage />} />
           <Route path="/compare" element={<ProtectedRoute><ComparePage /></ProtectedRoute>} />
           <Route path="/size-guide" element={<SizeGuidePage />} />
-          <Route path="/how-it-works" element={<PlaceholderPage title="How It Works" />} />
+          <Route path="/how-it-works" element={<HowItWorksPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
