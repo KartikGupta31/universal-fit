@@ -1,4 +1,3 @@
-
 async function apiRequest(url, options = {}) {
     const response = await fetch(url, options)
 
@@ -58,6 +57,29 @@ export async function register(email, password, displayName) {
 
     saveTokens(data)
     return data
+}
+
+// Exchange the refresh token for a new access/refresh token pair.
+// The backend rotates refresh tokens, so both values must be stored.
+export async function refreshAccessToken() {
+    const refreshToken = sessionStorage.getItem('refreshToken')
+    if (!refreshToken) return null
+
+    try {
+        const data = await apiRequest('/auth/refresh', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ refreshToken }),
+        })
+
+        saveTokens(data)
+        return data.accessToken
+    } catch {
+        logout()
+        return null
+    }
 }
 
 export function logout() {
