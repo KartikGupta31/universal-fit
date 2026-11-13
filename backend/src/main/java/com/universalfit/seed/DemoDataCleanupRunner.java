@@ -18,7 +18,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
- * One-time, opt-in cleanup for the two fictional development brands.
+ * One-time, opt-in cleanup for fictional demo brands and the retired Onitsuka Tiger entry.
  * User accounts, measurements, recommendations and feedback are intentionally untouched.
  * Enable with CLEANUP_DEMO_DATA=true for one startup, then turn it off again.
  */
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(name = "universalfit.cleanup.demo-data", havingValue = "true")
 public class DemoDataCleanupRunner implements ApplicationRunner {
     private static final Logger log = LoggerFactory.getLogger(DemoDataCleanupRunner.class);
-    private static final Set<String> DEMO_SLUGS = Set.of("demo-alpha-wear", "demo-beta-denim");
+    private static final Set<String> REMOVE_SLUGS = Set.of("demo-alpha-wear", "demo-beta-denim", "onitsuka-tiger");
 
     private final BrandRepository brands;
     private final ProductRepository products;
@@ -43,12 +43,12 @@ public class DemoDataCleanupRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        List<Brand> demoBrands = brands.findAll().stream()
-                .filter(brand -> DEMO_SLUGS.contains(brand.getSlug()))
+        List<Brand> removedBrands = brands.findAll().stream()
+                .filter(brand -> REMOVE_SLUGS.contains(brand.getSlug()))
                 .toList();
         int removedProducts = 0;
         int removedCharts = 0;
-        for (Brand brand : demoBrands) {
+        for (Brand brand : removedBrands) {
             ObjectId brandId = brand.getId();
             List<Product> linkedProducts = products.findByBrandId(brandId);
             for (Product product : linkedProducts) {
@@ -62,7 +62,7 @@ public class DemoDataCleanupRunner implements ApplicationRunner {
             charts.deleteAll(linkedCharts);
             brands.delete(brand);
         }
-        log.warn("Demo catalog cleanup complete: {} brands, {} products, {} charts removed. User data and activity history were preserved.",
-                demoBrands.size(), removedProducts, removedCharts);
+        log.warn("Catalog cleanup complete: {} brands, {} products, {} charts removed. User data and activity history were preserved.",
+                removedBrands.size(), removedProducts, removedCharts);
     }
 }
