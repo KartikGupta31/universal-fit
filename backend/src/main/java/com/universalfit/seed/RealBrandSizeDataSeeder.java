@@ -312,7 +312,7 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                 Category.TROUSERS, List.of(SizingSystem.WOMEN)));
         brands.save(puma);
         product(puma, "Men's Tops (PUMA UK body size reference)", Category.T_SHIRT, SizingSystem.MEN,
-                url, FitPreference.REGULAR, MeasurementBasis.BODY, "UK",
+                url + "#mens-tops", FitPreference.REGULAR, MeasurementBasis.BODY, "UK",
                 List.of(
                     bodyRow("XXS",73,80,60,67,null,null), bodyRow("XS",81,88,68,75,null,null),
                     bodyRow("S",89,96,76,83,null,null), bodyRow("M",97,104,84,91,null,null),
@@ -320,14 +320,14 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                     bodyRow("2XL",124,133,111,121,null,null), bodyRow("3XL",134,143,122,132,null,null),
                     bodyRow("4XL",144,153,133,143,null,null)));
         product(puma, "Women's Tops (PUMA UK body size reference)", Category.T_SHIRT, SizingSystem.WOMEN,
-                url, FitPreference.REGULAR, MeasurementBasis.BODY, "UK",
+                url + "#womens-tops", FitPreference.REGULAR, MeasurementBasis.BODY, "UK",
                 List.of(
                     bodyRow("XXS",75,79,59,63,83,87), bodyRow("XS",80,84,64,68,88,92),
                     bodyRow("S",85,90,69,74,93,98), bodyRow("M",91,98,75,82,99,106),
                     bodyRow("L",99,106,83,90,107,114), bodyRow("XL",107,114,91,99,115,122),
                     bodyRow("2XL",115,122,100,108,123,130), bodyRow("3XL",123,130,109,117,131,138)));
         product(puma, "Women's Bottoms (PUMA UK body size reference)", Category.TROUSERS, SizingSystem.WOMEN,
-                url, FitPreference.REGULAR, MeasurementBasis.BODY, "UK",
+                url + "#womens-bottoms", FitPreference.REGULAR, MeasurementBasis.BODY, "UK",
                 List.of(
                     bodyBottomRow("XXS",59,63,83,87,77.5), bodyBottomRow("XS",64,68,88,92,77.5),
                     bodyBottomRow("S",69,74,93,98,77.5), bodyBottomRow("M",75,82,99,106,77.5),
@@ -341,7 +341,7 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                 List.of(Category.T_SHIRT, Category.TROUSERS, Category.DRESS, Category.JACKET),
                 "Secondary source SizeCharter publishes Zara women's alpha-size body measurements in centimetres. Market/region is not specified by the source, so GLOBAL is a reference region only; individual Zara product charts take precedence. All records remain UNVERIFIED.");
         zara.setCountry("ES");
-        zara.setSupportedRegions(List.of("IN", "GLOBAL"));
+        zara.setSupportedRegions(List.of("GLOBAL"));
         zara.setSizingSystemsByCategory(Map.of(
                 Category.T_SHIRT, List.of(SizingSystem.WOMEN),
                 Category.TROUSERS, List.of(SizingSystem.WOMEN),
@@ -353,17 +353,17 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                 zaraTopRow("S",86.5,66,94), zaraTopRow("M",90,70,98),
                 zaraTopRow("L",96,76,104), zaraTopRow("XL",102,82,110));
         product(zara, "Women's Tops (Zara secondary body-size reference)", Category.T_SHIRT, SizingSystem.WOMEN,
-                url, FitPreference.REGULAR, MeasurementBasis.BODY, "GLOBAL", tops);
+                url + "#womens-tops", FitPreference.REGULAR, MeasurementBasis.BODY, "GLOBAL", tops);
         product(zara, "Women's Dresses (Zara secondary body-size reference)", Category.DRESS, SizingSystem.WOMEN,
-                url, FitPreference.REGULAR, MeasurementBasis.BODY, "GLOBAL", tops);
+                url + "#womens-dresses", FitPreference.REGULAR, MeasurementBasis.BODY, "GLOBAL", tops);
         product(zara, "Women's Bottoms (Zara secondary body-size reference)", Category.TROUSERS, SizingSystem.WOMEN,
-                url, FitPreference.REGULAR, MeasurementBasis.BODY, "GLOBAL",
+                url + "#womens-bottoms", FitPreference.REGULAR, MeasurementBasis.BODY, "GLOBAL",
                 List.of(
                     zaraBottomRow("XXS",58,85.5), zaraBottomRow("XS",62,90),
                     zaraBottomRow("S",66,94), zaraBottomRow("M",70,98),
                     zaraBottomRow("L",76,104), zaraBottomRow("XL",82,110)));
         product(zara, "Women's Jackets (Zara secondary body-size reference)", Category.JACKET, SizingSystem.WOMEN,
-                url, FitPreference.REGULAR, MeasurementBasis.BODY, "GLOBAL", tops);
+                url + "#womens-jackets", FitPreference.REGULAR, MeasurementBasis.BODY, "GLOBAL", tops);
     }
 
     private static SizeEntry zaraTopRow(String label, double bust, double waist, double hips) {
