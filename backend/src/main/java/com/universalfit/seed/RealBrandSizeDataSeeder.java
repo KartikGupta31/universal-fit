@@ -314,6 +314,14 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                     bodyRow("M",98,102,88,92,null,null), bodyRow("L",103,108,93,98,null,null),
                     bodyRow("XL",109,114,99,104,null,null), bodyRow("XXL",115,120,105,110,null,null),
                     bodyRow("3XL",121,126,111,116,null,null)));
+        product(tommy, "Men's Casual Shirts (body size guide)",
+                Category.SHIRT, SizingSystem.MEN, tommyUrl + "#shirts",
+                FitPreference.REGULAR, MeasurementBasis.BODY,
+                List.of(
+                    bodyRow("XS",88,92,78,82,null,null), bodyRow("S",93,97,83,87,null,null),
+                    bodyRow("M",98,102,88,92,null,null), bodyRow("L",103,108,93,98,null,null),
+                    bodyRow("XL",109,114,99,104,null,null), bodyRow("XXL",115,120,105,110,null,null),
+                    bodyRow("3XL",121,126,111,116,null,null)));
 
         String ckUrl = "https://www.nykaafashion.com/size-guide/sku?productSku=CALVI00011381&urlRedirect=true";
         Brand ck = saveBrand("calvin-klein", "Calvin Klein", ckUrl,
@@ -383,7 +391,7 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                 Category.TROUSERS, List.of(SizingSystem.MEN, SizingSystem.WOMEN)));
         brands.save(decathlon);
         product(decathlon, "Men's Tops (official body size guide)",
-                Category.T_SHIRT, SizingSystem.MEN, decathlonUrl,
+                Category.T_SHIRT, SizingSystem.MEN, decathlonUrl + "#mens-tops",
                 FitPreference.REGULAR, MeasurementBasis.BODY,
                 List.of(
                     bodyRow("XS",84,87,null,null,null,null), bodyRow("XS/S",88,91,null,null,null,null),
@@ -395,7 +403,7 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                     bodyRow("3XL",142,146,null,null,null,null), bodyRow("3XL/4XL",147,153,null,null,null,null),
                     bodyRow("4XL",154,159,null,null,null,null)));
         product(decathlon, "Men's Bottoms (official body size guide)", Category.TROUSERS, SizingSystem.MEN,
-                decathlonUrl, FitPreference.REGULAR, MeasurementBasis.BODY,
+                decathlonUrl + "#mens-bottoms", FitPreference.REGULAR, MeasurementBasis.BODY,
                 List.of(
                     waistBodyRow("36",70,73), waistBodyRow("38",74,77), waistBodyRow("40",78,81),
                     waistBodyRow("42",82,85), waistBodyRow("44",86,89), waistBodyRow("46",90,95),
@@ -418,7 +426,7 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                     garmentInchesRow("2XL",50.4,21.7,31.7,26.4), garmentInchesRow("3XL",53.5,22.4,31.7,26.4)));
 
         product(decathlon, "Women's Tops (official body size guide)",
-                Category.T_SHIRT, SizingSystem.WOMEN, decathlonUrl,
+                Category.T_SHIRT, SizingSystem.WOMEN, decathlonUrl + "#womens-tops",
                 FitPreference.REGULAR, MeasurementBasis.BODY,
                 List.of(
                     bodyRow("2",76,79,null,null,null,null), bodyRow("4",80,83,null,null,null,null),
@@ -430,7 +438,7 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                     bodyRow("26",130,135,null,null,null,null), bodyRow("28",136,141,null,null,null,null),
                     bodyRow("30",142,146,null,null,null,null), bodyRow("32",147,153,null,null,null,null)));
         product(decathlon, "Women's Bottoms (official body size guide)",
-                Category.TROUSERS, SizingSystem.WOMEN, decathlonUrl,
+                Category.TROUSERS, SizingSystem.WOMEN, decathlonUrl + "#womens-bottoms",
                 FitPreference.REGULAR, MeasurementBasis.BODY,
                 List.of(
                     waistBodyRow("32",57,58), waistBodyRow("34",58,62), waistBodyRow("36",63,65),
