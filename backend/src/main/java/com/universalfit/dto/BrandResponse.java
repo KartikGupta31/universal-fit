@@ -28,6 +28,6 @@ public record BrandResponse(
         return new BrandResponse(
                 Ids.hex(b.getId()), b.getSlug(), b.getName(), b.getLogoUrl(), b.getCountry(),
                 b.getSupportedRegions(), b.getCategories(), b.getSizingSystemsByCategory(), b.getDataSource(),
-                b.getVerificationStatus(), b.getLastVerifiedAt(), b.getNotes());
+                b.getVerificationStatus(), b.getLastVerifiedAt(), b.getNotes(), b.isActive());
     }
 }
