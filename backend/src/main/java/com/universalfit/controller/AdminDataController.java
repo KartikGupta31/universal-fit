@@ -123,8 +123,9 @@ public class AdminDataController {
         if (request == null || request.verified() == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "verified is required");
         if (request.verified()) {
-            if (chart.getSourceUrl() == null || chart.getSourceUrl().isBlank())
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A source URL is required before verification");
+            if (chart.getSourceUrl() == null || chart.getSourceUrl().isBlank()
+                    || chart.getDataSource() == null || chart.getDataSource().isBlank())
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A source name and source URL are required before verification");
             if (chart.getSizes() == null || chart.getSizes().isEmpty()
                     || chart.getSizes().stream().anyMatch(s -> s.getLabel() == null || s.getLabel().isBlank()
                     || s.getMeasurements() == null || s.getMeasurements().isEmpty()))
