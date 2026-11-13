@@ -27,6 +27,8 @@ import java.util.*;
 public class AdminDataController {
     private final BrandRepository brandRepository;
     private final SizeChartRepository chartRepository;
+    private final ProductRepository productRepository;
+    private final ProductSizeSpecRepository productSizeSpecRepository;
     private final UserRepository userRepository;
 
     @GetMapping("/brands")
@@ -80,14 +82,25 @@ public class AdminDataController {
     }
 
     @GetMapping("/charts")
-    public List<SizeChartResponse> charts(@RequestParam(required = false) String brandId,
-                                          Authentication auth) {
+    public List<AdminChartItem> charts(@RequestParam(required = false) String brandId,
+                                       Authentication auth) {
         requireAdmin(auth);
-        List<SizeChart> charts;
-        if (brandId == null || brandId.isBlank()) charts = chartRepository.findAll();
-        else charts = chartRepository.findByBrandId(new ObjectId(validId(brandId, "brand")));
-        return charts.stream().sorted(Comparator.comparing(SizeChart::getUpdatedAt,
-                Comparator.nullsLast(Comparator.reverseOrder()))).map(SizeChartResponse::from).toList();
+        List<AdminChartItem> result = new ArrayList<>();
+        List<SizeChart> charts = (brandId == null || brandId.isBlank())
+                ? chartRepository.findAll()
+                : chartRepository.findByBrandId(new ObjectId(validId(brandId, "brand")));
+        charts.forEach(chart -> result.add(AdminChartItem.from(chart)));
+
+        List<Product> products = (brandId == null || brandId.isBlank())
+                ? productRepository.findAll()
+                : productRepository.findByBrandId(new ObjectId(validId(brandId, "brand")));
+        for (Product product : products) {
+            productSizeSpecRepository.findByProductId(product.getId()).ifPresent(spec ->
+                    result.add(AdminChartItem.from(product, spec)));
+        }
+        result.sort(Comparator.comparing(AdminChartItem::updatedAt,
+                Comparator.nullsLast(Comparator.reverseOrder())));
+        return result;
     }
 
     @PostMapping("/charts")
@@ -210,6 +223,33 @@ public class AdminDataController {
     }
     private String slug(String value) {
         return value.toLowerCase(Locale.ROOT).trim().replaceAll("[^a-z0-9]+", "-").replaceAll("(^-|-$)", "");
+    }
+
+
+    /** Unified read model for brand-level charts and imported product-specific size specifications. */
+    public record AdminChartItem(String id, String brandId, Category category, SizingSystem sizingSystem,
+                                 String region, String productName, String collection,
+                                 MeasurementBasis measurementBasis, Unit unit, boolean garmentFlat,
+                                 FitPreference fitType, List<SizeEntry> sizes, String dataSource,
+                                 String sourceUrl, VerificationStatus verificationStatus,
+                                 Instant lastVerifiedAt, Instant updatedAt, boolean active,
+                                 String sourceType, Boolean recommendationEligible, String measurementNotes) {
+        static AdminChartItem from(SizeChart chart) {
+            return new AdminChartItem(Ids.hex(chart.getId()), Ids.hex(chart.getBrandId()),
+                    chart.getCategory(), chart.getSizingSystem(), chart.getRegion(), null,
+                    chart.getCollection(), chart.getMeasurementBasis(), chart.getUnit(),
+                    chart.isGarmentFlat(), chart.getFitType(), chart.getSizes(), chart.getDataSource(),
+                    chart.getSourceUrl(), chart.getVerificationStatus(), chart.getLastVerifiedAt(),
+                    chart.getUpdatedAt(), chart.isActive(), "BRAND_CHART", true, null);
+        }
+        static AdminChartItem from(Product product, ProductSizeSpec spec) {
+            return new AdminChartItem(Ids.hex(spec.getId()), Ids.hex(product.getBrandId()),
+                    product.getCategory(), product.getSizingSystem(), product.getRegion(), product.getName(),
+                    null, spec.getMeasurementBasis(), spec.getUnit(), spec.isGarmentFlat(),
+                    product.getFitType(), spec.getSizes(), spec.getDataSource(), spec.getSourceUrl(),
+                    spec.getVerificationStatus(), spec.getLastVerifiedAt(), spec.getUpdatedAt(),
+                    product.isActive(), "PRODUCT_SPEC", spec.getRecommendationEligible(), spec.getMeasurementNotes());
+        }
     }
 
     public record BrandRequest(String name, String slug, String logoUrl, String country,
