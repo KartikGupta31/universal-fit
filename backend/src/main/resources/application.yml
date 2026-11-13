@@ -13,6 +13,8 @@ universalfit:
   seed:
     demo-data: ${SEED_DEMO_DATA:false}   # DEMO / UNVERIFIED brands and size charts only
     real-brand-data: ${SEED_REAL_BRAND_DATA:false} # Source-linked real brand records and product charts
+  cleanup:
+    demo-data: ${CLEANUP_DEMO_DATA:false} # One-time opt-in removal of fictional demo catalog records
   engine:
     base-url: ${ENGINE_BASE_URL:http://localhost:8000}
     api-key: ${ENGINE_API_KEY:}

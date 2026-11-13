@@ -168,6 +168,17 @@ public class AdminDataController {
         chart.setGarmentFlat(Boolean.TRUE.equals(r.garmentFlat()));
         chart.setFitType(r.fitType() == null ? FitPreference.REGULAR : r.fitType());
         chart.setSizes(r.sizes()); chart.setDataSource(clean(r.dataSource())); chart.setSourceUrl(clean(r.sourceUrl()));
+        // Keep the public brand directory in sync with the chart records administrators create.
+        Set<Category> categories = new LinkedHashSet<>(brand.getCategories() == null ? List.of() : brand.getCategories());
+        categories.add(r.category());
+        brand.setCategories(new ArrayList<>(categories));
+        Map<Category, List<SizingSystem>> availability = new EnumMap<>(Category.class);
+        if (brand.getSizingSystemsByCategory() != null) availability.putAll(brand.getSizingSystemsByCategory());
+        Set<SizingSystem> systems = new LinkedHashSet<>(availability.getOrDefault(r.category(), List.of()));
+        systems.add(r.sizingSystem());
+        availability.put(r.category(), new ArrayList<>(systems));
+        brand.setSizingSystemsByCategory(availability);
+        brandRepository.save(brand);
         return chart;
     }
 
