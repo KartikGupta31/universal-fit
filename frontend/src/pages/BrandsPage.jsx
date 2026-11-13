@@ -81,8 +81,8 @@ function BrandsPage() {
                                     const systems = brand.sizingSystemsByCategory?.[item] || []
                                     const label = systems.length ? `${categoryLabels[item] || item} · ${systems.join(' / ')}` : (categoryLabels[item] || item)
                                     return <span key={item}>{label}</span>
-                                })}</div><p className="brand-empty-note">These categories have imported size charts. Select a matching region and sizing system to get a recommendation. Imported charts remain unverified until reviewed.</p></> : <div className="brand-empty-note"><p>No recommendation-ready categories yet.</p><p>{brand.notes || 'We are adding and reviewing this brand’s size charts. Check back as more sizing data becomes available.'}</p></div>}
-                                <div className="brand-card-footer"><span>{verified ? <><ShieldCheck size={14} /> Verified chart data</> : <><AlertCircle size={14} /> {brand.verificationStatus === 'DEMO_UNVERIFIED' ? 'Demo data — not for use' : 'Unverified chart data'}</>}</span>{hasSizingCategories && <Link to="/find-size">Find my size <ArrowUpRight size={14} /></Link>}</div>
+                                })}</div><p className="brand-empty-note">These categories have imported size charts. Select a matching region and sizing system to get a recommendation.</p></> : <div className="brand-empty-note"><p>No recommendation-ready categories yet.</p><p>{brand.notes || 'We are adding and reviewing this brand’s size charts. Check back as more sizing data becomes available.'}</p></div>}
+                                <div className="brand-card-footer"><span>{verified ? <><ShieldCheck size={14} /> Verified chart data</> : brand.verificationStatus === 'DEMO_UNVERIFIED' ? <><AlertCircle size={14} /> Demo data — not for use</> : null}</span>{hasSizingCategories && <Link to="/find-size">Find my size <ArrowUpRight size={14} /></Link>}</div>
                             </article>
                         )
                     })}
