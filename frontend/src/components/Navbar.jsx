@@ -50,10 +50,10 @@ function Navbar() {
                         </Link>
                     </>
                 ) : (
-                    <span className="account-status">
+                    <Link to="/account" className="account-status">
                         <UserRound size={16} />
                         <span>{isAdmin ? 'ADMIN' : 'ACCOUNT'}</span>
-                    </span>
+                    </Link>
                 )}
             </div>
 
