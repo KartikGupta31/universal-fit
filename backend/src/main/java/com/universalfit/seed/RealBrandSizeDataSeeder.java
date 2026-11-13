@@ -223,20 +223,19 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
      */
     private void seedAdditionalBrandCharts() {
         Brand allen = saveBrand("allen-solly", "Allen Solly",
-                "https://www.nykaafashion.com/size-guide/sku?productSku=ALLAA00205927&urlRedirect=true",
+                "https://www.nykaafashion.com/size-guide/sku?productSku=ALLAA00265799&urlRedirect=true",
                 List.of(Category.SHIRT), "Men's slim-fit shirt chart from Nykaa Fashion product measurements (secondary retailer source). Values are published in inches and normalized to cm. Product-specific; UNVERIFIED.");
         allen.setCountry("IN");
         allen.setSizingSystemsByCategory(Map.of(Category.SHIRT, List.of(SizingSystem.MEN)));
         brands.save(allen);
-        product(allen, "Men's Black Slim Fit Check Shirt (product-specific)",
+        product(allen, "Men's Blue Slim Fit Print Full Sleeves Casual Shirt (product-specific)",
                 Category.SHIRT, SizingSystem.MEN,
-                "https://www.nykaafashion.com/size-guide/sku?productSku=ALLAA00205927&urlRedirect=true",
+                "https://www.nykaafashion.com/size-guide/sku?productSku=ALLAA00265799&urlRedirect=true",
                 FitPreference.SLIM, MeasurementBasis.GARMENT,
                 List.of(
-                    garmentInchesRow("38",40.2,16.5,29.5,null), garmentInchesRow("39",41.7,17.5,30,null),
-                    garmentInchesRow("40",43.5,18.5,30.5,null), garmentInchesRow("42",46,19.5,30.7,null),
-                    garmentInchesRow("44",48.5,20.5,31,null), garmentInchesRow("46",51,21.5,31.2,null),
-                    garmentInchesRow("48",53.5,22.5,31.5,null)));
+                    garmentInchesRow("38",40.2,16.5,null,null), garmentInchesRow("39",41.7,17.5,null,null),
+                    garmentInchesRow("40",43.5,18.5,null,null), garmentInchesRow("42",46,19.5,null,null),
+                    garmentInchesRow("44",48.5,20.5,null,null), garmentInchesRow("46",51,21.5,null,null)));
 
         Brand van = saveBrand("van-heusen", "Van Heusen",
                 "https://www.nykaafashion.com/size-guide/sku?productSku=VANAA00174529&urlRedirect=true",
@@ -255,21 +254,21 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                     garmentInchesRow("3XL",47.5,19.5,30.5,null)));
 
         Brand peter = saveBrand("peter-england", "Peter England",
-                "https://www.nykaafashion.com/size-guide/sku?productSku=PETAA00225876&urlRedirect=true",
+                "https://www.nykaafashion.com/size-guide/sku?productSku=PETAA00228843&urlRedirect=true",
                 List.of(Category.T_SHIRT), "Men's crew-neck T-shirt chart from Nykaa Fashion product measurements (secondary retailer source). Values are published in inches and normalized to cm. Product-specific; UNVERIFIED.");
         peter.setCountry("IN");
         peter.setSizingSystemsByCategory(Map.of(Category.T_SHIRT, List.of(SizingSystem.MEN)));
         brands.save(peter);
         product(peter, "Men's Black Crew Neck T-shirt (product-specific)",
                 Category.T_SHIRT, SizingSystem.MEN,
-                "https://www.nykaafashion.com/size-guide/sku?productSku=PETAA00225876&urlRedirect=true",
+                "https://www.nykaafashion.com/size-guide/sku?productSku=PETAA00228843&urlRedirect=true",
                 FitPreference.REGULAR, MeasurementBasis.GARMENT,
                 List.of(
                     garmentInchesRow("S",38.5,16.5,null,null), garmentInchesRow("M",40.5,17,null,null),
                     garmentInchesRow("L",42.5,17.5,null,null), garmentInchesRow("XL",45.5,18.3,null,null),
                     garmentInchesRow("2XL",48.5,19,null,null), garmentInchesRow("3XL",51.5,19.5,null,null)));
 
-        String uspaUrl = "https://uspoloassn.in/collections/men-t-shirts/products/menswear-solid-regular-fit-t-shirt-9ck4pu4i2sz";
+        String uspaUrl = "https://uspoloassn.in/products/menswear-solid-relaxed-fit-t-shirt-y425pwwbizz";
         Brand uspa = saveBrand("us-polo-assn", "U.S. Polo Assn.", uspaUrl,
                 List.of(Category.T_SHIRT), "Official U.S. Polo Assn. India product chart. Garment chest, shoulder and length in cm; tied to the listed regular-fit T-shirt. UNVERIFIED.");
         uspa.setCountry("US");
@@ -285,7 +284,7 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                     garmentCmRow("XXXL",133,55.9,82.5,null), garmentCmRow("XXXXL",138,58.4,83.8,null),
                     garmentCmRow("XXXXXL",141,61,88.9,null)));
 
-        String jackUrl = "https://www.jackjones.in/collections/jj-all-product";
+        String jackUrl = "https://www.jackjones.in/products/902274101-logo-print-slim-fit-o-neck-t-shirt-white";
         Brand jack = saveBrand("jack-jones", "Jack & Jones", jackUrl,
                 List.of(Category.T_SHIRT), "Men's organic cotton slim-fit T-shirt chart shown on Jack & Jones India product listing (brand-owned source). Values are in cm. Product-specific; UNVERIFIED.");
         jack.setCountry("DK");
@@ -330,23 +329,22 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                     garmentInchesRow("M",40,17.1,28.4,null), garmentInchesRow("L",42,17.6,29.1,null),
                     garmentInchesRow("XL",44,18.1,29.9,null), garmentInchesRow("2XL",46,18.7,30.7,null)));
 
-        String bibaUrl = "https://www.nykaafashion.com/productSizeGuide.php?productSku=BIBAX00014357";
+        String bibaUrl = "https://www.nykaafashion.com/size-guide/sku?productSku=BIBAX00028419&urlRedirect=true";
         Brand biba = saveBrand("biba", "BIBA", bibaUrl,
-                List.of(Category.T_SHIRT, Category.TOP), "Women's kurta body-fit chart from Nykaa Fashion (secondary retailer source). Published body bust/waist/hip values are in inches and normalized to cm. Product-specific fit reference; UNVERIFIED.");
+                List.of(Category.TOP), "Women's kurta body-fit chart from Nykaa Fashion (secondary retailer source). Published body bust/waist/hip values are in inches and normalized to cm. Product-specific fit reference; UNVERIFIED.");
         biba.setCountry("IN");
         biba.setSizingSystemsByCategory(Map.of(
-                Category.T_SHIRT, List.of(SizingSystem.WOMEN),
                 Category.TOP, List.of(SizingSystem.WOMEN)));
         brands.save(biba);
         product(biba, "Women's Straight Kurta (body measurements this product fits)",
                 Category.TOP, SizingSystem.WOMEN, bibaUrl,
                 FitPreference.REGULAR, MeasurementBasis.BODY,
                 List.of(
-                    bodyInchesRow("S",32,33,28,29,36,37), bodyInchesRow("M",34,35,30,31,38,39),
-                    bodyInchesRow("L",36,37,32,33,40,41), bodyInchesRow("XL",38,39,34,35,42,43),
-                    bodyInchesRow("2XL",40,41,36,38,44,45), bodyInchesRow("3XL",42,43,40,41,47,48)));
+                    bodyInchesRow("32",32,33,28,29,36,37), bodyInchesRow("34",34,35,30,31,38,39),
+                    bodyInchesRow("36",36,37,32,33,40,41), bodyInchesRow("38",38,39,34,35,42,43),
+                    bodyInchesRow("40",40,41,36,38,44,45), bodyInchesRow("42",42,43,40,41,47,48)));
 
-        String fabUrl = "https://www.nykaafashion.com/size-guide/sku?productSku=FABIN00033167&urlRedirect=true";
+        String fabUrl = "https://www.nykaafashion.com/size-guide/sku?productSku=FABIN00028001&urlRedirect=true";
         Brand fab = saveBrand("fabindia", "Fabindia", fabUrl,
                 List.of(Category.TOP), "Women's kurta body-fit chart from Nykaa Fashion (secondary retailer source). Body bust/waist/hip values are in inches and normalized to cm. Product-specific fit reference; UNVERIFIED.");
         fab.setCountry("IN");
@@ -378,11 +376,11 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
 
         String decathlonUrl = "https://d1314cmsbd81ch.cloudfront.net/size_guide/sizeguide_en.html";
         Brand decathlon = saveBrand("decathlon", "Decathlon", decathlonUrl,
-                List.of(Category.T_SHIRT, Category.TROUSERS), "Official Decathlon clothing size guide. Body measurements in cm. Men's tops and bottoms and women's tops are separate charts; imported rows remain UNVERIFIED.");
+                List.of(Category.T_SHIRT, Category.TROUSERS), "Official Decathlon clothing size guide. Body measurements in cm. Men's and women's tops and bottoms are separate charts; imported rows remain UNVERIFIED.");
         decathlon.setCountry("FR");
         decathlon.setSizingSystemsByCategory(Map.of(
                 Category.T_SHIRT, List.of(SizingSystem.MEN, SizingSystem.WOMEN),
-                Category.TROUSERS, List.of(SizingSystem.MEN)));
+                Category.TROUSERS, List.of(SizingSystem.MEN, SizingSystem.WOMEN)));
         brands.save(decathlon);
         product(decathlon, "Men's Tops (official body size guide)",
                 Category.T_SHIRT, SizingSystem.MEN, decathlonUrl,
@@ -419,6 +417,29 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                     garmentInchesRow("L",46.5,20.1,29.9,25.6), garmentInchesRow("XL",48,20.9,30.9,26),
                     garmentInchesRow("2XL",50.4,21.7,31.7,26.4), garmentInchesRow("3XL",53.5,22.4,31.7,26.4)));
 
+        product(decathlon, "Women's Tops (official body size guide)",
+                Category.T_SHIRT, SizingSystem.WOMEN, decathlonUrl,
+                FitPreference.REGULAR, MeasurementBasis.BODY,
+                List.of(
+                    bodyRow("2",76,79,null,null,null,null), bodyRow("4",80,83,null,null,null,null),
+                    bodyRow("6",84,87,null,null,null,null), bodyRow("8",86,91,null,null,null,null),
+                    bodyRow("10",92,95,null,null,null,null), bodyRow("12",96,99,null,null,null,null),
+                    bodyRow("14",100,103,null,null,null,null), bodyRow("16",104,107,null,null,null,null),
+                    bodyRow("18",108,113,null,null,null,null), bodyRow("20",114,118,null,null,null,null),
+                    bodyRow("22",119,123,null,null,null,null), bodyRow("24",124,129,null,null,null,null),
+                    bodyRow("26",130,135,null,null,null,null), bodyRow("28",136,141,null,null,null,null),
+                    bodyRow("30",142,146,null,null,null,null), bodyRow("32",147,153,null,null,null,null)));
+        product(decathlon, "Women's Bottoms (official body size guide)",
+                Category.TROUSERS, SizingSystem.WOMEN, decathlonUrl,
+                FitPreference.REGULAR, MeasurementBasis.BODY,
+                List.of(
+                    waistBodyRow("32",57,58), waistBodyRow("34",58,62), waistBodyRow("36",63,65),
+                    waistBodyRow("38",66,69), waistBodyRow("40",70,73), waistBodyRow("42",74,77),
+                    waistBodyRow("44",78,84), waistBodyRow("46",85,90), waistBodyRow("48",91,96),
+                    waistBodyRow("50",97,102), waistBodyRow("52",103,108), waistBodyRow("54",109,114),
+                    waistBodyRow("56",115,120), waistBodyRow("58",121,128), waistBodyRow("60",129,132),
+                    waistBodyRow("62",133,139)));
+
         // Bonkers Corner's retailer table labels the field "Product Chest" but the extracted
         // source does not establish whether it is a circumference or a flat width. Keep it
         // visible to administrators but explicitly ineligible for recommendations until checked.
@@ -431,9 +452,15 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
         rawPendingProduct(bonkers, "Men's Black Printed T-shirt (raw retailer chest table)",
                 Category.T_SHIRT, SizingSystem.MEN, bonkersUrl,
                 List.of(
-                    widthRow("XS",41,0), widthRow("S",43,0), widthRow("M",45,0),
-                    widthRow("L",47,0), widthRow("XL",49,0), widthRow("2XL",51,0)),
-                "Nykaa Fashion labels this field Product Chest, but its extracted chart does not establish unit or flat-vs-circumference method. Stored for administrator review only; not recommendation eligible.");
+                    chestOnlyRow("XS",41), chestOnlyRow("S",43), chestOnlyRow("M",45),
+                    chestOnlyRow("L",47), chestOnlyRow("XL",49), chestOnlyRow("2XL",51)),
+                "Nykaa Fashion labels this field Product Chest and displays 41–51 in its size-guide table. The source extraction does not establish flat-vs-circumference method. Stored for administrator review only; not recommendation eligible.");
+    }
+
+    private static SizeEntry chestOnlyRow(String label, double chest) {
+        Map<String, MeasurementRange> m = new LinkedHashMap<>();
+        m.put("chest", MeasurementRange.of(chest));
+        return new SizeEntry(label, m);
     }
 
     private static SizeEntry waistBodyRow(String label, double waistMin, double waistMax) {
