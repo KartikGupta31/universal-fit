@@ -45,28 +45,27 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                 Category.TROUSERS, List.of(SizingSystem.WOMEN)));
         brands.save(hm);
         String hmWomenUrl = "https://th.hm.com/pages/size-guide-women";
-        product(hm, "Women's Tops (H&M Thailand body size guide)", Category.T_SHIRT, SizingSystem.WOMEN,
+        product(hm, "Women's Tops (H&M Thailand numeric EU body size guide)", Category.T_SHIRT, SizingSystem.WOMEN,
                 hmWomenUrl, FitPreference.REGULAR, MeasurementBasis.BODY, "TH",
                 List.of(
-                    bodyRow("XXS",74,78,58,62,79,83), bodyRow("XS",78,82,62,66,83,87),
-                    bodyRow("S",82,86,66,70,87,91), bodyRow("M",90,94,74,78,94.5,97.5),
-                    bodyRow("L",98,102,82.5,87.5,100.5,103.5), bodyRow("XL",107,113,93,99,107.5,112.5),
-                    bodyRow("XXL",119,125,105,111,117.5,122.5), bodyRow("3XL",131,137,117.5,124.5,128,134)));
+                    bodyRow("32",74,78,58,62,79,83), bodyRow("34",78,82,62,66,83,87),
+                    bodyRow("36",82,86,66,70,87,91), bodyRow("38",86,90,70,74,91,94.5),
+                    bodyRow("40",90,94,74,78,94.5,97.5), bodyRow("42",94,98,78,82,97.5,100.5),
+                    bodyRow("44",98,102,82.5,87.5,100.5,103.5), bodyRow("46",102,107,87.5,93,103.5,107.5),
+                    bodyRow("48",107,113,93,99,107.5,112.5), bodyRow("50",113,119,99,105,112.5,117.5),
+                    bodyRow("52",119,125,105,111,117.5,122.5), bodyRow("54",125,131,111,117.5,122.5,128),
+                    bodyRow("56",131,137,117.5,124.5,128,134), bodyRow("58",137,143,124.5,131.5,134,140)));
         String hmMenUrl = "https://th.hm.com/pages/size-guide-men-tops-jackets-shirts-and-blazers";
-        product(hm, "Men's Tops (H&M Thailand body size guide)", Category.T_SHIRT, SizingSystem.MEN,
+        product(hm, "Men's Tops (H&M Thailand numeric EU body size guide)", Category.T_SHIRT, SizingSystem.MEN,
                 hmMenUrl, FitPreference.REGULAR, MeasurementBasis.BODY, "TH",
                 List.of(
-                    bodyRow("XXS",74,78,62,66,null,null), bodyRow("XS",78,82,66,70,null,null),
-                    bodyRow("S",82,86,70,74,null,null), bodyRow("M",90,94,78,82,null,null),
-                    bodyRow("L",98,102,86,90,null,null), bodyRow("XL",106,110,94,98.5,null,null),
-                    bodyRow("XXL",114,118,103,107.5,null,null), bodyRow("3XL",122,126,112,116.5,null,null)));
-        product(hm, "Women's Trousers (H&M Thailand body size guide)", Category.TROUSERS, SizingSystem.WOMEN,
-                hmWomenUrl, FitPreference.REGULAR, MeasurementBasis.BODY, "TH",
-                List.of(
-                    bodyBottomRow("XXS",58,62,79,83,73), bodyBottomRow("XS",62,66,83,87,73),
-                    bodyBottomRow("S",66,70,87,91,73), bodyBottomRow("M",74,78,94.5,97.5,73),
-                    bodyBottomRow("L",82.5,87.5,100.5,103.5,73), bodyBottomRow("XL",93,99,107.5,112.5,73),
-                    bodyBottomRow("XXL",105,111,117.5,122.5,73), bodyBottomRow("3XL",117.5,124.5,128,134,73)));
+                    bodyRow("38",74,78,62,66,null,null), bodyRow("40",78,82,66,70,null,null),
+                    bodyRow("42",82,86,70,74,null,null), bodyRow("44",86,90,74,78,null,null),
+                    bodyRow("46",90,94,78,82,null,null), bodyRow("48",94,98,82,86,null,null),
+                    bodyRow("50",98,102,86,90,null,null), bodyRow("52",102,106,90,94,null,null),
+                    bodyRow("54",106,110,94,98.5,null,null), bodyRow("56",110,114,98.5,103,null,null),
+                    bodyRow("58",114,118,103,107.5,null,null), bodyRow("60",118,122,107.5,112,null,null),
+                    bodyRow("62",122,126,112,116.5,null,null)));
         rawProduct(hm, "Men's Light green Loose Fit Washed T-shirt", Category.T_SHIRT, SizingSystem.MEN,
                 "https://www2.hm.com/en_in/productpage.1275904004.html", FitPreference.RELAXED,
                 List.of(widthRow("XS",100,66), widthRow("S",108,67), widthRow("M",116,68), widthRow("L",124,70)));
