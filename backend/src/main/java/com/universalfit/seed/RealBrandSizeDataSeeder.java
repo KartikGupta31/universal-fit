@@ -329,10 +329,10 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
         product(puma, "Women's Bottoms (PUMA UK body size reference)", Category.TROUSERS, SizingSystem.WOMEN,
                 url + "#womens-bottoms", FitPreference.REGULAR, MeasurementBasis.BODY, "UK",
                 List.of(
-                    bodyBottomRow("XXS",59,63,83,87,77.5), bodyBottomRow("XS",64,68,88,92,77.5),
-                    bodyBottomRow("S",69,74,93,98,77.5), bodyBottomRow("M",75,82,99,106,77.5),
-                    bodyBottomRow("L",83,90,107,114,77), bodyBottomRow("XL",91,99,115,122,76),
-                    bodyBottomRow("2XL",100,108,123,130,75), bodyBottomRow("3XL",109,117,131,138,74)));
+                    pumaBottomRow("XXS",59,63,83,87), pumaBottomRow("XS",64,68,88,92),
+                    pumaBottomRow("S",69,74,93,98), pumaBottomRow("M",75,82,99,106),
+                    pumaBottomRow("L",83,90,107,114), pumaBottomRow("XL",91,99,115,122),
+                    pumaBottomRow("2XL",100,108,123,130), pumaBottomRow("3XL",109,117,131,138)));
     }
 
     private void seedZara() {
@@ -348,10 +348,11 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                 Category.DRESS, List.of(SizingSystem.WOMEN),
                 Category.JACKET, List.of(SizingSystem.WOMEN)));
         brands.save(zara);
+        // SizeCharter publishes this chart in inches; convert to centimetres (x 2.54).
         List<SizeEntry> tops = List.of(
-                zaraTopRow("XXS",80,58,85.5), zaraTopRow("XS",82,62,90),
-                zaraTopRow("S",86.5,66,94), zaraTopRow("M",90,70,98),
-                zaraTopRow("L",96,76,104), zaraTopRow("XL",102,82,110));
+                zaraTopRow("XXS",80.01,57.79,85.73), zaraTopRow("XS",81.92,62.23,90.17),
+                zaraTopRow("S",86.36,66.04,93.98), zaraTopRow("M",90.17,69.85,97.79),
+                zaraTopRow("L",95.89,76.20,104.14), zaraTopRow("XL",102.24,81.92,109.86));
         product(zara, "Women's Tops (Zara secondary body-size reference)", Category.T_SHIRT, SizingSystem.WOMEN,
                 url + "#womens-tops", FitPreference.REGULAR, MeasurementBasis.BODY, "GLOBAL", tops);
         product(zara, "Women's Dresses (Zara secondary body-size reference)", Category.DRESS, SizingSystem.WOMEN,
@@ -359,9 +360,9 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
         product(zara, "Women's Bottoms (Zara secondary body-size reference)", Category.TROUSERS, SizingSystem.WOMEN,
                 url + "#womens-bottoms", FitPreference.REGULAR, MeasurementBasis.BODY, "GLOBAL",
                 List.of(
-                    zaraBottomRow("XXS",58,85.5), zaraBottomRow("XS",62,90),
-                    zaraBottomRow("S",66,94), zaraBottomRow("M",70,98),
-                    zaraBottomRow("L",76,104), zaraBottomRow("XL",82,110)));
+                    zaraBottomRow("XXS",57.79,85.73), zaraBottomRow("XS",62.23,90.17),
+                    zaraBottomRow("S",66.04,93.98), zaraBottomRow("M",69.85,97.79),
+                    zaraBottomRow("L",76.20,104.14), zaraBottomRow("XL",81.92,109.86)));
         product(zara, "Women's Jackets (Zara secondary body-size reference)", Category.JACKET, SizingSystem.WOMEN,
                 url + "#womens-jackets", FitPreference.REGULAR, MeasurementBasis.BODY, "GLOBAL", tops);
     }
@@ -395,6 +396,14 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
         m.put("waist", MeasurementRange.of(waistMin, waistMax));
         m.put("hips", MeasurementRange.of(hipMin, hipMax));
         m.put("inseam", MeasurementRange.of(inseam));
+        return new SizeEntry(label, m);
+    }
+
+    private static SizeEntry pumaBottomRow(String label, double waistMin, double waistMax,
+                                            double hipMin, double hipMax) {
+        Map<String, MeasurementRange> m = new LinkedHashMap<>();
+        m.put("waist", MeasurementRange.of(waistMin, waistMax));
+        m.put("hips", MeasurementRange.of(hipMin, hipMax));
         return new SizeEntry(label, m);
     }
 
