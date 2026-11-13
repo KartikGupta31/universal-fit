@@ -10,16 +10,15 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
- * Imports exact style-specific measurements from official Levi's India product pages.
- * These are GARMENT measurements for the named style only, not universal body charts.
- * Every source record is UNVERIFIED until an administrator reviews it.
+ * Imports source-backed size data from official brand pages across their published regions.
+ * Product-specific GARMENT charts are kept separate from BODY measurement charts.
+ * Every imported source record is UNVERIFIED until an administrator reviews it.
  *
  * Enable with SEED_REAL_BRAND_DATA=true. Safe to run repeatedly; products are keyed by source URL.
  */
 @Component
 @ConditionalOnProperty(name = "universalfit.seed.real-brand-data", havingValue = "true")
 public class RealBrandSizeDataSeeder implements ApplicationRunner {
-    private static final String SOURCE = "Official Levi's India product size chart";
     private final BrandRepository brands;
     private final ProductRepository products;
     private final ProductSizeSpecRepository specs;
