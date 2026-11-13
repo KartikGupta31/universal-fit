@@ -1,17 +1,31 @@
+import { refreshAccessToken } from './authService'
 
 const API_URL = '/api'
 
 async function measurementRequest(endpoint, options = {}) {
-    const token = sessionStorage.getItem('accessToken')
+    async function sendRequest(token) {
+        return fetch(`${API_URL}${endpoint}`, {
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                ...options.headers,
+            },
+        })
+    }
 
-    const response = await fetch(`${API_URL}${endpoint}`, {
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-            ...options.headers,
-        },
-    })
+    let token = sessionStorage.getItem('accessToken')
+    let response = await sendRequest(token)
+
+    // Access tokens expire after 15 minutes. Refresh once, then retry the
+    // original request with the newly issued access token.
+    if (response.status === 401) {
+        const refreshedToken = await refreshAccessToken()
+        if (refreshedToken) {
+            token = refreshedToken
+            response = await sendRequest(token)
+        }
+    }
 
     if (response.status === 204) {
         return null
