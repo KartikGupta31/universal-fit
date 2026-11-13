@@ -64,7 +64,7 @@ function AdminDashboardPage() {
                 <h1>Dashboard</h1>
                 <p>Understand fit outcomes, feedback quality and brand coverage.</p>
             </div>
-            <button type="button" className="admin-refresh" onClick={loadDashboard}>Refresh data</button>
+            <div className="admin-header-actions"><a className="admin-refresh" href="/admin/catalog">Manage brands & size charts</a><button type="button" className="admin-refresh" onClick={loadDashboard}>Refresh data</button></div>
         </header>
 
         {error && <p className="admin-error" role="alert">{error}</p>}
