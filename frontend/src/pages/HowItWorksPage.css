@@ -46,3 +46,28 @@
 .hiw-bottom h2{font-size:clamp(32px,4vw,48px)}
 @media(max-width:760px){.hiw-hero{padding:70px 6% 50px}.hiw-flow{grid-template-columns:repeat(2,1fr);margin-top:45px}.hiw-flow-item:nth-child(3){border-left:1px solid #d9d2c8}.hiw-flow-item:nth-child(n+3){border-top:1px solid #d9d2c8}.hiw-steps-section{padding:75px 6%}.hiw-step{grid-template-columns:1fr;gap:30px;padding:40px 0}.hiw-step-reverse .hiw-visual,.hiw-step-reverse .hiw-copy{order:initial}.hiw-visual{min-height:280px}.hiw-transparency{margin:0 6% 65px;padding:28px;gap:17px}.hiw-bottom{margin:0 6% 65px;padding:35px 7%;align-items:flex-start;flex-direction:column}}
 @media(max-width:420px){.hiw-flow-item{padding:18px 15px}.hiw-hero h1{font-size:43px}.hiw-transparency{display:block}.hiw-transparency>svg{margin-bottom:18px}}
+
+
+/* Match the homepage's warm neutral editorial identity */
+.how-it-works-page { background:#f7f5ef; color:#171713; }
+.hiw-hero { background:linear-gradient(120deg,#f7f5ef,#eae5da); padding:100px 7vw 76px; }
+.hiw-eyebrow { color:#817b6f; letter-spacing:.2em; }
+.hiw-eyebrow span { background:#817b6f; }
+.hiw-hero h1,.hiw-heading h2,.hiw-bottom h2,.hiw-copy h3,.hiw-transparency h2 { font-family:'Italiana',Georgia,serif; font-weight:400; color:#171713; letter-spacing:-.025em; }
+.hiw-hero h1 { font-size:clamp(54px,6.3vw,84px); line-height:1; }
+.hiw-hero h1 em,.hiw-heading h2 em,.hiw-bottom h2 em { color:#898477; }
+.hiw-lead,.hiw-description,.hiw-transparency p:last-child { color:#706f67; }
+.hiw-primary { background:#171713; border-radius:0; }
+.hiw-primary:hover { background:#45443d; }
+.hiw-secondary { color:#171713; border-color:#898477; }
+.hiw-flow { border-color:#d8d2c6; }
+.hiw-flow-item { border-color:#d8d2c6; color:#817b6f; }
+.hiw-flow-item strong { color:#171713; }
+.hiw-visual { background:#eae6dc; }
+.hiw-number { color:#aaa395; }
+.hiw-icon { color:#625f56; background:linear-gradient(145deg,#fbfaf6,#d8d2c6); box-shadow:18px 22px 35px #41332520,inset 2px 2px 5px #ffffff; }
+.hiw-visual-label { color:#817b6f; }
+.hiw-copy li { color:#514e46; }
+.hiw-copy li svg,.hiw-note svg,.hiw-transparency>svg { color:#817b6f; }
+.hiw-note,.hiw-transparency,.hiw-bottom { background:#eae6dc; }
+@media(max-width:760px) { .hiw-hero { padding:68px 6% 52px; } }
