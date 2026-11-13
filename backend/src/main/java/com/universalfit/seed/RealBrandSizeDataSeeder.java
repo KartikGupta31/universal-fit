@@ -255,11 +255,11 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
 
         Brand peter = saveBrand("peter-england", "Peter England",
                 "https://www.nykaafashion.com/size-guide/sku?productSku=PETAA00228843&urlRedirect=true",
-                List.of(Category.T_SHIRT), "Men's crew-neck T-shirt chart from Nykaa Fashion product measurements (secondary retailer source). Values are published in inches and normalized to cm. Product-specific; UNVERIFIED.");
+                List.of(Category.T_SHIRT), "Men's polo T-shirt chart from Nykaa Fashion product measurements (secondary retailer source). Values are published in inches and normalized to cm. Product-specific; UNVERIFIED.");
         peter.setCountry("IN");
         peter.setSizingSystemsByCategory(Map.of(Category.T_SHIRT, List.of(SizingSystem.MEN)));
         brands.save(peter);
-        product(peter, "Men's Black Crew Neck T-shirt (product-specific)",
+        product(peter, "Men's Beige Cotton Collar Neck Polo T-shirt (product-specific)",
                 Category.T_SHIRT, SizingSystem.MEN,
                 "https://www.nykaafashion.com/size-guide/sku?productSku=PETAA00228843&urlRedirect=true",
                 FitPreference.REGULAR, MeasurementBasis.GARMENT,
@@ -270,13 +270,13 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
 
         String uspaUrl = "https://uspoloassn.in/products/menswear-solid-relaxed-fit-t-shirt-y425pwwbizz";
         Brand uspa = saveBrand("us-polo-assn", "U.S. Polo Assn.", uspaUrl,
-                List.of(Category.T_SHIRT), "Official U.S. Polo Assn. India product chart. Garment chest, shoulder and length in cm; tied to the listed regular-fit T-shirt. UNVERIFIED.");
+                List.of(Category.T_SHIRT), "Official U.S. Polo Assn. India product chart. Garment chest, shoulder and length in cm; tied to the listed relaxed-fit T-shirt. UNVERIFIED.");
         uspa.setCountry("US");
         uspa.setSizingSystemsByCategory(Map.of(Category.T_SHIRT, List.of(SizingSystem.MEN)));
         brands.save(uspa);
-        product(uspa, "Men's Solid Regular Fit T-shirt (official India product chart)",
+        product(uspa, "Men's Solid Relaxed Fit T-shirt (official India product chart)",
                 Category.T_SHIRT, SizingSystem.MEN, uspaUrl,
-                FitPreference.REGULAR, MeasurementBasis.GARMENT,
+                FitPreference.RELAXED, MeasurementBasis.GARMENT,
                 List.of(
                     garmentCmRow("XS",96.5,40.6,71.1,null), garmentCmRow("S",100,43.2,73.7,null),
                     garmentCmRow("M",105,45.7,74.9,null), garmentCmRow("L",114,48.3,78.7,null),
@@ -358,7 +358,7 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
         fab.setCountry("IN");
         fab.setSizingSystemsByCategory(Map.of(Category.TOP, List.of(SizingSystem.WOMEN)));
         brands.save(fab);
-        product(fab, "Women's Cotton Printed Kurta (body measurements this product fits)",
+        product(fab, "Women's Cotton Embroidered Regular Fit Kurta (body measurements this product fits)",
                 Category.TOP, SizingSystem.WOMEN, fabUrl,
                 FitPreference.REGULAR, MeasurementBasis.BODY,
                 List.of(
