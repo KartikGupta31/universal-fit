@@ -529,3 +529,35 @@
 .history-item span, .history-item small, .history-feedback { color: #777168; font-size: 12px; }
 .history-feedback { text-transform: capitalize; }
 @media (max-width: 600px) { .history-item { align-items: flex-start; flex-direction: column; } }
+
+
+/* Universal Fit editorial design system */
+.find-size-page { background:#f7f5ef; color:#171713; padding:72px 6vw 90px; }
+.measurement-container { max-width:1160px; }
+.measurement-heading h1,.consent-card h1,.measurement-section h2,.consent-details h3,.recommendation-result>h2,.result-detail h3 { font-family:'Italiana',Georgia,serif; color:#171713; font-weight:400; }
+.measurement-heading h1,.consent-card h1 { font-size:clamp(44px,5.5vw,72px); letter-spacing:-.03em; }
+.eyebrow { color:#817b6f; letter-spacing:.2em; font-size:9px; }
+.page-description,.consent-description { color:#706f67; max-width:600px; }
+.profile-status,.account-count { border-color:#d8d2c6; }
+.measurement-section { border-color:#dcd7cc; }
+.measurement-section h2 { font-size:31px; }
+.section-heading p,.section-description { color:#77746c; }
+.unit-selector { border-color:#d4cfc4; background:#eeebe3; }
+.unit-selector button.active,.primary-button { background:#171713; }
+.primary-button:hover { background:#45443d; }
+.measurement-input-wrap,.fit-option,.product-select-label select { border-color:#d8d2c6; background:#fbfaf6; border-radius:0; }
+.measurement-input-wrap:focus-within,.product-select-label select:focus { border-color:#817b6f; }
+.fit-option.selected { border-color:#171713; background:#eae6dc; }
+.save-section { border-color:#dcd7cc; }
+.consent-card,.recommendation-result { background:#fbfaf6; border-color:#ded9ce; border-radius:0; box-shadow:0 18px 45px #29251b0a; }
+.consent-details { background:#f0ede5; }
+.recommended-size { background:#eae6dc; border-radius:0; }
+.recommended-size strong { font-family:'Italiana',Georgia,serif; font-size:64px; }
+.selection-grid { max-width:850px; }
+.product-select-label { color:#625f56; font-size:11px; letter-spacing:.04em; }
+.product-select-label select { color:#171713; }
+.recommendation-result { padding:clamp(22px,4vw,42px); }
+.recommendation-result>h2 { font-size:36px; }
+.alternative-sizes span { border-radius:0; border-color:#d8d2c6; background:#f7f5ef; }
+.brand-sizing-unavailable { border-radius:0; background:#f0ede5; }
+@media(max-width:768px) { .find-size-page { padding:48px 5% 65px; } }
