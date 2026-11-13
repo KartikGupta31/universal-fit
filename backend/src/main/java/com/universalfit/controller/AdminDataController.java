@@ -240,6 +240,8 @@ public class AdminDataController {
         return chart;
     }
 
+    private static String hex(ObjectId id) { return id == null ? null : id.toHexString(); }
+
     private Brand findBrand(String id) {
         return brandRepository.findById(new ObjectId(validId(id, "brand")))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Brand not found"));
