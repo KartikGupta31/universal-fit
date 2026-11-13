@@ -306,7 +306,7 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                 List.of(Category.T_SHIRT, Category.TROUSERS),
                 "Secondary retailer guide reproduces PUMA published body-size ranges and labels the chart UK sizing. Region is UK; imported data remains UNVERIFIED pending admin source review.");
         puma.setCountry("DE");
-        puma.setSupportedRegions(List.of("IN", "UK"));
+        puma.setSupportedRegions(List.of("UK"));
         puma.setSizingSystemsByCategory(Map.of(
                 Category.T_SHIRT, List.of(SizingSystem.MEN, SizingSystem.WOMEN),
                 Category.TROUSERS, List.of(SizingSystem.WOMEN)));
