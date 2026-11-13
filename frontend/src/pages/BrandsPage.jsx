@@ -39,7 +39,7 @@ function BrandsPage() {
             <section className="discovery-hero">
                 <p className="discovery-eyebrow">THE UNIVERSAL FIT DIRECTORY</p>
                 <h1>One profile.<br /><em>Every brand.</em></h1>
-                <p>Explore the brands in our directory, see which categories they support, and check the status of their sizing data before finding your size.</p>
+                <p>Explore the brands in our directory, see which categories have sizing data, and check the data status before finding your size.</p>
                 <div className="discovery-hero-meta"><span><Ruler size={16} /> Cross-brand sizing</span><span><ShieldCheck size={16} /> Transparent data status</span></div>
             </section>
 
@@ -71,19 +71,19 @@ function BrandsPage() {
                                 <div className="brand-card-top"><span className="brand-logo-wrap">
                                     {brandDomains[brand.name] ? <img className="brand-logo" src={`https://www.google.com/s2/favicons?domain=${brandDomains[brand.name]}&sz=128`} alt={`${brand.name} logo`} loading="lazy" onError={event => { event.currentTarget.style.display = 'none'; event.currentTarget.nextElementSibling.style.display = 'grid' }} /> : null}
                                     <span className="brand-logo-fallback" style={{ display: brandDomains[brand.name] ? 'none' : 'grid' }}>{brand.name.slice(0, 1).toUpperCase()}</span>
-                                </span><span className={hasSizingCategories ? 'data-pill data-ready' : 'data-pill data-pending'}>{hasSizingCategories ? 'SIZING CATEGORIES LISTED' : 'NO SIZING DATA YET'}</span></div>
+                                </span><span className={hasSizingCategories ? 'data-pill data-ready' : 'data-pill data-pending'}>{hasSizingCategories ? 'CATEGORIES WITH SIZE DATA' : 'CHARTS IN PREPARATION'}</span></div>
                                 <h3 className="brand-card-name">{brand.name}</h3>
                                 <p className="brand-origin">{brand.country ? `Brand origin: ${brand.country}` : 'Brand sizing directory'}</p>
                                 <p className="brand-origin">{regions.length ? `Sizing regions: ${regions.join(', ')}` : 'Sizing region not specified'}</p>
                                 <div className="brand-card-divider" />
-                                <p className="brand-card-label">SUPPORTED CATEGORIES</p>
-                                {hasSizingCategories ? <><div className="brand-category-tags">{supported.map(item => <span key={item}>{categoryLabels[item] || item}</span>)}</div><p className="brand-empty-note">Category sizing data is listed. Availability depends on region and sizing system.</p></> : <p className="brand-empty-note">No recommendation categories are available yet. Sizing data is still being added.</p>}
+                                <p className="brand-card-label">RECOMMENDATION-READY CATEGORIES</p>
+                                {hasSizingCategories ? <><div className="brand-category-tags">{supported.map(item => <span key={item}>{categoryLabels[item] || item}</span>)}</div><p className="brand-empty-note">Sizing data is available for these categories. Exact availability depends on region and sizing system. Imported charts remain unverified until reviewed.</p></> : <div className="brand-empty-note"><p>No recommendation-ready categories yet.</p><p>{brand.notes || 'We are adding and reviewing this brand’s size charts. Check back as more sizing data becomes available.'}</p></div>}
                                 <div className="brand-card-footer"><span>{verified ? <><ShieldCheck size={14} /> Verified chart data</> : <><AlertCircle size={14} /> {brand.verificationStatus === 'DEMO_UNVERIFIED' ? 'Demo data — not for use' : 'Unverified chart data'}</>}</span>{hasSizingCategories && <Link to="/find-size">Find my size <ArrowUpRight size={14} /></Link>}</div>
                             </article>
                         )
                     })}
                 </div>
-                <p className="directory-footnote">A listed brand does not automatically mean every category has a usable size chart. We show availability and verification status openly; unverified data is never presented as verified.</p>
+                <p className="directory-footnote">A brand can be listed before its charts are ready. We only show categories with imported sizing data here, and recommendations are available only when the selected region, sizing system and chart are supported.</p>
             </section>
         </div>
     )
