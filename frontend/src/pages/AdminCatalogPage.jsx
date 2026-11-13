@@ -27,6 +27,7 @@ function AdminCatalogPage() {
     const [saving, setSaving] = useState(false)
     const [error, setError] = useState('')
     const [notice, setNotice] = useState('')
+    const [verificationFilter, setVerificationFilter] = useState('PENDING')
 
     async function load() {
         setError('')
@@ -84,6 +85,12 @@ function AdminCatalogPage() {
         } catch (e) { setError(e.message) }
     }
 
+    const pendingCharts = charts.filter(chart => chart.verificationStatus !== 'VERIFIED')
+    const verifiedCharts = charts.filter(chart => chart.verificationStatus === 'VERIFIED')
+    const visibleCharts = charts.filter(chart => verificationFilter === 'ALL'
+        || (verificationFilter === 'PENDING' && chart.verificationStatus !== 'VERIFIED')
+        || (verificationFilter === 'VERIFIED' && chart.verificationStatus === 'VERIFIED'))
+
     if (loading) return <main className="admin-catalog-page"><p>Loading catalog management...</p></main>
 
     return <main className="admin-catalog-page">
@@ -102,15 +109,27 @@ function AdminCatalogPage() {
         </nav>
 
         {activeTab === 'charts' && <section className="catalog-panel">
-            <div className="catalog-panel-title"><div><p className="catalog-eyebrow">SIZING DATA</p><h2>All size charts</h2></div><button onClick={load}>Refresh</button></div>
-            {charts.length === 0 ? <p className="catalog-empty">No size data found. Check that real brand data seeding is enabled and has completed.</p> : <div className="catalog-table-wrap"><table className="catalog-table">
+            <div className="catalog-panel-title"><div><p className="catalog-eyebrow">SIZING DATA</p><h2>Size chart verification</h2>
+                <p className="catalog-help">Review the source and measurement rows before approving imported data for recommendations.</p></div><button onClick={load}>Refresh</button></div>
+            <div className="verification-summary">
+                <button className={verificationFilter === 'PENDING' ? 'selected' : ''} onClick={() => setVerificationFilter('PENDING')}>
+                    <strong>{pendingCharts.length}</strong><span>Pending verification</span></button>
+                <button className={verificationFilter === 'VERIFIED' ? 'selected' : ''} onClick={() => setVerificationFilter('VERIFIED')}>
+                    <strong>{verifiedCharts.length}</strong><span>Verified charts</span></button>
+                <button className={verificationFilter === 'ALL' ? 'selected' : ''} onClick={() => setVerificationFilter('ALL')}>
+                    <strong>{charts.length}</strong><span>All charts</span></button>
+            </div>
+            <div className="catalog-filter-caption">Showing {visibleCharts.length} {verificationFilter === 'PENDING' ? 'pending verification' : verificationFilter.toLowerCase()} records</div>
+            {charts.length === 0 ? <p className="catalog-empty">No size data found. Check that real brand data seeding is enabled and has completed.</p> :
+                visibleCharts.length === 0 ? <p className="catalog-empty">No charts in this verification status.</p> :
+                <div className="catalog-table-wrap"><table className="catalog-table">
                 <thead><tr><th>Brand / style</th><th>Category</th><th>System</th><th>Region</th><th>Basis</th><th>Sizes & measurements</th><th>Source</th><th>Verification</th><th>Status / actions</th></tr></thead>
-                <tbody>{charts.map(chart => <tr key={chart.id}>
+                <tbody>{visibleCharts.map(chart => <tr key={chart.id}>
                     <td><strong>{brands.find(b => b.id === chart.brandId)?.name || 'Brand'}</strong>{chart.productName && <small className="catalog-subline">{chart.productName}</small>}<small className="catalog-subline">{chart.sourceType === 'PRODUCT_SPEC' ? 'Product-specific chart' : 'Brand chart'}</small></td>
                     <td>{chart.category}</td><td>{chart.sizingSystem}</td><td>{chart.region}</td><td>{chart.measurementBasis}{chart.garmentFlat ? ' · flat' : ''}</td>
                     <td><details className="catalog-size-details"><summary>{chart.sizes?.length || 0} sizes · view data</summary><pre>{JSON.stringify(chart.sizes || [], null, 2)}</pre>{chart.measurementNotes && <small>{chart.measurementNotes}</small>}</details></td>
                     <td>{chart.sourceUrl ? <a href={chart.sourceUrl} target="_blank" rel="noreferrer">Open source</a> : '—'}<small className="catalog-subline">{chart.dataSource}</small></td>
-                    <td><span className={`catalog-status ${chart.verificationStatus === 'VERIFIED' ? 'verified' : ''}`}>{chart.verificationStatus}</span>{chart.recommendationEligible === false && <small className="catalog-subline">Not eligible for recommendations</small>}</td>
+                    <td><span className={`catalog-status ${chart.verificationStatus === 'VERIFIED' ? 'verified' : ''}`}>{chart.verificationStatus === 'VERIFIED' ? 'VERIFIED' : 'PENDING VERIFICATION'}</span>{chart.recommendationEligible === false && <small className="catalog-subline">Not eligible for recommendations</small>}</td>
                     <td className="catalog-actions">{chart.verificationStatus !== 'VERIFIED' ?
                         <button onClick={() => verifyChart(chart, true)}>Verify</button> :
                         <button onClick={() => verifyChart(chart, false)}>Unverify</button>}
