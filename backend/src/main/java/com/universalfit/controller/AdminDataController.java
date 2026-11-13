@@ -5,6 +5,8 @@ import com.universalfit.domain.model.*;
 import com.universalfit.dto.BrandResponse;
 import com.universalfit.dto.SizeChartResponse;
 import com.universalfit.repository.BrandRepository;
+import com.universalfit.repository.ProductRepository;
+import com.universalfit.repository.ProductSizeSpecRepository;
 import com.universalfit.repository.SizeChartRepository;
 import com.universalfit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
