@@ -7,6 +7,7 @@ import RegisterPage from './pages/RegisterPage'
 import { useAuth } from './context/AuthContext'
 import FindSizePage from './pages/FindSizePage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
+import AdminCatalogPage from './pages/AdminCatalogPage'
 import BrandsPage from './pages/BrandsPage'
 import ComparePage from './pages/ComparePage'
 import SizeGuidePage from './pages/SizeGuidePage'
@@ -53,6 +54,7 @@ function App() {
           />
 
           <Route path="/admin" element={<ProtectedRoute><AdminDashboardPage /></ProtectedRoute>} />
+          <Route path="/admin/catalog" element={<ProtectedRoute><AdminCatalogPage /></ProtectedRoute>} />
           <Route path="/brands" element={<BrandsPage />} />
           <Route path="/compare" element={<ProtectedRoute><ComparePage /></ProtectedRoute>} />
           <Route path="/size-guide" element={<SizeGuidePage />} />
