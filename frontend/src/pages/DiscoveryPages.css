@@ -19,3 +19,32 @@
 .foot-length-photo{width:100%;height:142px;max-width:190px;object-fit:contain;border-radius:7px;background:#fff;mix-blend-mode:multiply}
 .measurement-diagram:has(.foot-length-photo){justify-content:center}
 @media(max-width:600px){.foot-length-photo{height:128px}}
+
+
+/* Editorial ivory treatment shared by brand directory, compare and size guide */
+.discovery-page { background:#f7f5ef; color:#171713; }
+.discovery-hero { background:linear-gradient(120deg,#f5f2ea,#e8e2d6); padding:88px 7vw 78px; }
+.discovery-eyebrow { color:#817b6f; letter-spacing:.2em; font-size:9px; }
+.discovery-hero h1,.discovery-section-heading h2,.guide-intro h2,.guide-cta h2,.brand-directory-card h3,.compare-result-brand,.compare-size-value,.measurement-guide-card h3,.guide-tool-card strong,.guide-cta h2 { font-family:'Italiana',Georgia,serif; font-weight:400; color:#171713; }
+.discovery-hero h1 { font-size:clamp(54px,6.5vw,86px); line-height:.99; letter-spacing:-.03em; }
+.discovery-hero h1 em { color:#898477; }
+.discovery-hero>p:not(.discovery-eyebrow) { color:#706f67; }
+.discovery-content { padding-top:76px; }
+.discovery-section-heading h2 { font-size:42px; }
+.discovery-count { color:#77746c; }
+.directory-search,.directory-toolbar select,.compare-controls select { border-color:#d8d2c6; background:#fbfaf6; border-radius:0; }
+.brand-directory-card,.compare-result-card,.measurement-guide-card,.guide-tool-card { background:#fbfaf6; border-color:#ded9ce; border-radius:0; box-shadow:0 12px 32px #29251b08; }
+.brand-directory-card h3 { font-size:29px; }
+.brand-card-label { color:#817b6f; }
+.brand-category-tags span { background:#eeebe3; color:#625f56; }
+.brand-card-footer a { color:#171713; }
+.discovery-primary { background:#171713; border-radius:0; }
+.discovery-primary:hover { background:#45443d; }
+.compare-brand-option { background:#fbfaf6; border-color:#d8d2c6; border-radius:0; }
+.compare-brand-option.selected { border-color:#171713; background:#eae6dc; }
+.compare-size-value { font-size:66px; }
+.guide-unit-note,.guide-extra-measurements { background:#eae6dc; }
+.guide-cta { background:#eae6dc; }
+.guide-cta a { background:#171713; }
+.data-pill { border-radius:0; }
+@media(max-width:600px) { .discovery-hero { padding:62px 6% 55px; } .discovery-content { padding:50px 5% 65px; } }
