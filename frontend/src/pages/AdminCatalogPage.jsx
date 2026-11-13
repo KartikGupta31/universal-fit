@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import {
     getAdminBrands, createAdminBrand, setAdminBrandActive,
     getAdminCharts, createAdminChart, setAdminChartVerified, setAdminChartActive,
+    setAdminProductSpecVerified, setAdminProductSpecActive,
 } from '../services/adminCatalogService'
 import './AdminCatalogPage.css'
 
@@ -67,12 +68,20 @@ function AdminCatalogPage() {
         catch (e) { setError(e.message) }
     }
     async function verifyChart(chart, verified) {
-        try { await setAdminChartVerified(chart.id, verified); setNotice(verified ? 'Chart verified.' : 'Chart returned to unverified.'); await load() }
-        catch (e) { setError(e.message) }
+        try {
+            if (chart.sourceType === 'PRODUCT_SPEC') await setAdminProductSpecVerified(chart.id, verified)
+            else await setAdminChartVerified(chart.id, verified)
+            setNotice(verified ? 'Size data verified.' : 'Size data returned to unverified.')
+            await load()
+        } catch (e) { setError(e.message) }
     }
     async function toggleChart(chart) {
-        try { await setAdminChartActive(chart.id, !chart.active); setNotice('Chart status updated.'); await load() }
-        catch (e) { setError(e.message) }
+        try {
+            if (chart.sourceType === 'PRODUCT_SPEC') await setAdminProductSpecActive(chart.id, !chart.active)
+            else await setAdminChartActive(chart.id, !chart.active)
+            setNotice('Size data status updated.')
+            await load()
+        } catch (e) { setError(e.message) }
     }
 
     if (loading) return <main className="admin-catalog-page"><p>Loading catalog management...</p></main>
@@ -94,11 +103,14 @@ function AdminCatalogPage() {
 
         {activeTab === 'charts' && <section className="catalog-panel">
             <div className="catalog-panel-title"><div><p className="catalog-eyebrow">SIZING DATA</p><h2>All size charts</h2></div><button onClick={load}>Refresh</button></div>
-            {charts.length === 0 ? <p className="catalog-empty">No size charts found.</p> : <div className="catalog-table-wrap"><table className="catalog-table">
-                <thead><tr><th>Brand</th><th>Category</th><th>System</th><th>Region</th><th>Basis</th><th>Sizes</th><th>Verification</th><th>Actions</th></tr></thead>
+            {charts.length === 0 ? <p className="catalog-empty">No size data found. Check that real brand data seeding is enabled and has completed.</p> : <div className="catalog-table-wrap"><table className="catalog-table">
+                <thead><tr><th>Brand / style</th><th>Category</th><th>System</th><th>Region</th><th>Basis</th><th>Sizes & measurements</th><th>Source</th><th>Verification</th><th>Status / actions</th></tr></thead>
                 <tbody>{charts.map(chart => <tr key={chart.id}>
-                    <td>{brands.find(b => b.id === chart.brandId)?.name || 'Brand'}</td><td>{chart.category}</td><td>{chart.sizingSystem}</td><td>{chart.region}</td><td>{chart.measurementBasis}</td><td>{chart.sizes?.length || 0}</td>
-                    <td><span className={`catalog-status ${chart.verificationStatus === 'VERIFIED' ? 'verified' : ''}`}>{chart.verificationStatus}</span></td>
+                    <td><strong>{brands.find(b => b.id === chart.brandId)?.name || 'Brand'}</strong>{chart.productName && <small className="catalog-subline">{chart.productName}</small>}<small className="catalog-subline">{chart.sourceType === 'PRODUCT_SPEC' ? 'Product-specific chart' : 'Brand chart'}</small></td>
+                    <td>{chart.category}</td><td>{chart.sizingSystem}</td><td>{chart.region}</td><td>{chart.measurementBasis}{chart.garmentFlat ? ' · flat' : ''}</td>
+                    <td><details className="catalog-size-details"><summary>{chart.sizes?.length || 0} sizes · view data</summary><pre>{JSON.stringify(chart.sizes || [], null, 2)}</pre>{chart.measurementNotes && <small>{chart.measurementNotes}</small>}</details></td>
+                    <td>{chart.sourceUrl ? <a href={chart.sourceUrl} target="_blank" rel="noreferrer">Open source</a> : '—'}<small className="catalog-subline">{chart.dataSource}</small></td>
+                    <td><span className={`catalog-status ${chart.verificationStatus === 'VERIFIED' ? 'verified' : ''}`}>{chart.verificationStatus}</span>{chart.recommendationEligible === false && <small className="catalog-subline">Not eligible for recommendations</small>}</td>
                     <td className="catalog-actions">{chart.verificationStatus !== 'VERIFIED' ?
                         <button onClick={() => verifyChart(chart, true)}>Verify</button> :
                         <button onClick={() => verifyChart(chart, false)}>Unverify</button>}
