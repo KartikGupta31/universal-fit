@@ -15,6 +15,8 @@ public interface SizeChartRepository
 
     List<SizeChart> findByBrandIdAndActiveTrue(ObjectId brandId);
 
+    List<SizeChart> findByBrandId(ObjectId brandId);
+
     List<SizeChart> findByBrandIdAndCategoryAndActiveTrue(
             ObjectId brandId,
             Category category
