@@ -282,7 +282,8 @@ function FindSizePage() {
     }
 
     async function handleRecommendation() {
-        if (!selectedBrand || !selectedCategory || !selectedSizingSystem || !selectedRegion) {
+        const regionRequired = (selectedBrandData?.supportedRegions || []).length > 0
+        if (!selectedBrand || !selectedCategory || !selectedSizingSystem || (regionRequired && !selectedRegion)) {
             setError('Please select a brand, category, sizing system and region first.')
             return
         }
@@ -345,7 +346,7 @@ function FindSizePage() {
 
     const selectedBrandData = brands.find(brand => brand.id === selectedBrand)
     const supportedCategories = selectedBrandData?.categories || []
-    const supportedSizingSystems = selectedBrandData?.sizingSystemsByCategory?.[selectedCategory] || ['UNISEX']
+    const supportedSizingSystems = selectedBrandData?.sizingSystemsByCategory?.[selectedCategory] || []
     const categoryLabels = { T_SHIRT: 'T-shirts', SHIRT: 'Shirts', JEANS: 'Jeans', TROUSERS: 'Trousers', JACKET: 'Jackets', HOODIE: 'Hoodies', DRESS: 'Dresses', TOP: 'Tops' }
 
     if (loading) {
@@ -616,7 +617,7 @@ function FindSizePage() {
                             )}
                             {supportedCategories.length > 0 && (
                                 <button type="button" className="primary-button recommendation-button" onClick={handleRecommendation}
-                                    disabled={!selectedBrand || !selectedCategory || !selectedSizingSystem || recommending || !hasProfile}>
+                                    disabled={!selectedBrand || !selectedCategory || !selectedSizingSystem || ((selectedBrandData?.supportedRegions || []).length > 0 && !selectedRegion) || recommending || !hasProfile}>
                                     {recommending ? 'Finding your size...' : 'Find My Size'}
                                 </button>
                             )}
