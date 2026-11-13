@@ -37,8 +37,36 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                 "https://www.zara.com/in/en/zara-timeless---contrast-collar-t-shirt-p06061534.html", List.of(),
                 "Official India product pages direct customers to the size guide or to request measurements. Numeric size rows were not available in the accessible official source, so no values were invented.");
         Brand hm = saveBrand("h-and-m", "H&M",
-                "https://www2.hm.com/en_in/customer-service/sizeguide/sizing-faq.html", List.of(),
-                "Two official India T-shirt product tables are retained as raw Width and Length values. The source does not define width axis/flat-vs-circumference, so these records are inactive and excluded from recommendations until verified.");
+                "https://th.hm.com/pages/size-guide-women", List.of(Category.T_SHIRT, Category.TROUSERS),
+                "Official H&M Thailand body-measurement guides supplement India product-specific raw width/length records. TH charts are separate from IN product records; all imported records remain UNVERIFIED.");
+        hm.setSupportedRegions(List.of("IN", "TH"));
+        hm.setSizingSystemsByCategory(Map.of(
+                Category.T_SHIRT, List.of(SizingSystem.MEN, SizingSystem.WOMEN),
+                Category.TROUSERS, List.of(SizingSystem.WOMEN)));
+        brands.save(hm);
+        String hmWomenUrl = "https://th.hm.com/pages/size-guide-women";
+        product(hm, "Women's Tops (H&M Thailand body size guide)", Category.T_SHIRT, SizingSystem.WOMEN,
+                hmWomenUrl, FitPreference.REGULAR, MeasurementBasis.BODY, "TH",
+                List.of(
+                    bodyRow("XXS",74,78,58,62,79,83), bodyRow("XS",78,82,62,66,83,87),
+                    bodyRow("S",82,86,66,70,87,91), bodyRow("M",90,94,74,78,94.5,97.5),
+                    bodyRow("L",98,102,82.5,87.5,100.5,103.5), bodyRow("XL",107,113,93,99,107.5,112.5),
+                    bodyRow("XXL",119,125,105,111,117.5,122.5), bodyRow("3XL",131,137,117.5,124.5,128,134)));
+        String hmMenUrl = "https://th.hm.com/pages/size-guide-men-tops-jackets-shirts-and-blazers";
+        product(hm, "Men's Tops (H&M Thailand body size guide)", Category.T_SHIRT, SizingSystem.MEN,
+                hmMenUrl, FitPreference.REGULAR, MeasurementBasis.BODY, "TH",
+                List.of(
+                    bodyRow("XXS",74,78,62,66,null,null), bodyRow("XS",78,82,66,70,null,null),
+                    bodyRow("S",82,86,70,74,null,null), bodyRow("M",90,94,78,82,null,null),
+                    bodyRow("L",98,102,86,90,null,null), bodyRow("XL",106,110,94,98.5,null,null),
+                    bodyRow("XXL",114,118,103,107.5,null,null), bodyRow("3XL",122,126,112,116.5,null,null)));
+        product(hm, "Women's Trousers (H&M Thailand body size guide)", Category.TROUSERS, SizingSystem.WOMEN,
+                hmWomenUrl, FitPreference.REGULAR, MeasurementBasis.BODY, "TH",
+                List.of(
+                    bodyBottomRow("XXS",58,62,79,83,73), bodyBottomRow("XS",62,66,83,87,73),
+                    bodyBottomRow("S",66,70,87,91,73), bodyBottomRow("M",74,78,94.5,97.5,73),
+                    bodyBottomRow("L",82.5,87.5,100.5,103.5,73), bodyBottomRow("XL",93,99,107.5,112.5,73),
+                    bodyBottomRow("XXL",105,111,117.5,122.5,73), bodyBottomRow("3XL",117.5,124.5,128,134,73)));
         rawProduct(hm, "Men's Light green Loose Fit Washed T-shirt", Category.T_SHIRT, SizingSystem.MEN,
                 "https://www2.hm.com/en_in/productpage.1275904004.html", FitPreference.RELAXED,
                 List.of(widthRow("XS",100,66), widthRow("S",108,67), widthRow("M",116,68), widthRow("L",124,70)));
@@ -183,6 +211,7 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
         seedNike();
         seedAdidas();
         seedPuma();
+        seedZara();
     }
 
     private static SizeEntry bodyEntry(String label, double chest, double waist, double hips, double shoulder) {
@@ -273,12 +302,84 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
     }
 
     private void seedPuma() {
-        String url = "https://in.puma.com/in/en/help/how-to-place-an-order-faq";
-        Brand puma = saveBrand("puma", "PUMA", url, List.of(),
-                "Official PUMA India FAQ states apparel uses US sizing and product-specific size charts are provided on product pages. No general numeric apparel chart imported yet; select a product-specific chart before enabling recommendations.");
+        String url = "https://weekendsports.co.uk/pages/puma-size-guide";
+        Brand puma = saveBrand("puma", "PUMA", url,
+                List.of(Category.T_SHIRT, Category.TROUSERS),
+                "Secondary retailer guide reproduces PUMA published body-size ranges and labels the chart UK sizing. Region is UK; imported data remains UNVERIFIED pending admin source review.");
         puma.setCountry("DE");
-        puma.setSupportedRegions(List.of("IN"));
+        puma.setSupportedRegions(List.of("IN", "UK"));
+        puma.setSizingSystemsByCategory(Map.of(
+                Category.T_SHIRT, List.of(SizingSystem.MEN, SizingSystem.WOMEN),
+                Category.TROUSERS, List.of(SizingSystem.WOMEN)));
         brands.save(puma);
+        product(puma, "Men's Tops (PUMA UK body size reference)", Category.T_SHIRT, SizingSystem.MEN,
+                url, FitPreference.REGULAR, MeasurementBasis.BODY, "UK",
+                List.of(
+                    bodyRow("XXS",73,80,60,67,null,null), bodyRow("XS",81,88,68,75,null,null),
+                    bodyRow("S",89,96,76,83,null,null), bodyRow("M",97,104,84,91,null,null),
+                    bodyRow("L",105,113,92,100,null,null), bodyRow("XL",114,123,101,110,null,null),
+                    bodyRow("2XL",124,133,111,121,null,null), bodyRow("3XL",134,143,122,132,null,null),
+                    bodyRow("4XL",144,153,133,143,null,null)));
+        product(puma, "Women's Tops (PUMA UK body size reference)", Category.T_SHIRT, SizingSystem.WOMEN,
+                url, FitPreference.REGULAR, MeasurementBasis.BODY, "UK",
+                List.of(
+                    bodyRow("XXS",75,79,59,63,83,87), bodyRow("XS",80,84,64,68,88,92),
+                    bodyRow("S",85,90,69,74,93,98), bodyRow("M",91,98,75,82,99,106),
+                    bodyRow("L",99,106,83,90,107,114), bodyRow("XL",107,114,91,99,115,122),
+                    bodyRow("2XL",115,122,100,108,123,130), bodyRow("3XL",123,130,109,117,131,138)));
+        product(puma, "Women's Bottoms (PUMA UK body size reference)", Category.TROUSERS, SizingSystem.WOMEN,
+                url, FitPreference.REGULAR, MeasurementBasis.BODY, "UK",
+                List.of(
+                    bodyBottomRow("XXS",59,63,83,87,77.5), bodyBottomRow("XS",64,68,88,92,77.5),
+                    bodyBottomRow("S",69,74,93,98,77.5), bodyBottomRow("M",75,82,99,106,77.5),
+                    bodyBottomRow("L",83,90,107,114,77), bodyBottomRow("XL",91,99,115,122,76),
+                    bodyBottomRow("2XL",100,108,123,130,75), bodyBottomRow("3XL",109,117,131,138,74)));
+    }
+
+    private void seedZara() {
+        String url = "https://www.sizecharter.com/brands/zar/womens";
+        Brand zara = saveBrand("zara", "Zara", url,
+                List.of(Category.T_SHIRT, Category.TROUSERS, Category.DRESS, Category.JACKET),
+                "Secondary source SizeCharter publishes Zara women's alpha-size body measurements in centimetres. Market/region is not specified by the source, so GLOBAL is a reference region only; individual Zara product charts take precedence. All records remain UNVERIFIED.");
+        zara.setCountry("ES");
+        zara.setSupportedRegions(List.of("IN", "GLOBAL"));
+        zara.setSizingSystemsByCategory(Map.of(
+                Category.T_SHIRT, List.of(SizingSystem.WOMEN),
+                Category.TROUSERS, List.of(SizingSystem.WOMEN),
+                Category.DRESS, List.of(SizingSystem.WOMEN),
+                Category.JACKET, List.of(SizingSystem.WOMEN)));
+        brands.save(zara);
+        List<SizeEntry> tops = List.of(
+                zaraTopRow("XXS",80,58,85.5), zaraTopRow("XS",82,62,90),
+                zaraTopRow("S",86.5,66,94), zaraTopRow("M",90,70,98),
+                zaraTopRow("L",96,76,104), zaraTopRow("XL",102,82,110));
+        product(zara, "Women's Tops (Zara secondary body-size reference)", Category.T_SHIRT, SizingSystem.WOMEN,
+                url, FitPreference.REGULAR, MeasurementBasis.BODY, "GLOBAL", tops);
+        product(zara, "Women's Dresses (Zara secondary body-size reference)", Category.DRESS, SizingSystem.WOMEN,
+                url, FitPreference.REGULAR, MeasurementBasis.BODY, "GLOBAL", tops);
+        product(zara, "Women's Bottoms (Zara secondary body-size reference)", Category.TROUSERS, SizingSystem.WOMEN,
+                url, FitPreference.REGULAR, MeasurementBasis.BODY, "GLOBAL",
+                List.of(
+                    zaraBottomRow("XXS",58,85.5), zaraBottomRow("XS",62,90),
+                    zaraBottomRow("S",66,94), zaraBottomRow("M",70,98),
+                    zaraBottomRow("L",76,104), zaraBottomRow("XL",82,110)));
+        product(zara, "Women's Jackets (Zara secondary body-size reference)", Category.JACKET, SizingSystem.WOMEN,
+                url, FitPreference.REGULAR, MeasurementBasis.BODY, "GLOBAL", tops);
+    }
+
+    private static SizeEntry zaraTopRow(String label, double bust, double waist, double hips) {
+        Map<String, MeasurementRange> m = new LinkedHashMap<>();
+        m.put("chest", MeasurementRange.of(bust));
+        m.put("waist", MeasurementRange.of(waist));
+        m.put("hips", MeasurementRange.of(hips));
+        return new SizeEntry(label, m);
+    }
+
+    private static SizeEntry zaraBottomRow(String label, double waist, double hips) {
+        Map<String, MeasurementRange> m = new LinkedHashMap<>();
+        m.put("waist", MeasurementRange.of(waist));
+        m.put("hips", MeasurementRange.of(hips));
+        return new SizeEntry(label, m);
     }
 
     private static SizeEntry nikeBottomRow(String label, double waistMin, double waistMax,
