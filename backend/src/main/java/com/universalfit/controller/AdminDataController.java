@@ -284,7 +284,7 @@ public class AdminDataController {
                                  Instant lastVerifiedAt, Instant updatedAt, boolean active,
                                  String sourceType, Boolean recommendationEligible, String measurementNotes) {
         static AdminChartItem from(SizeChart chart) {
-            return new AdminChartItem(Ids.hex(chart.getId()), Ids.hex(chart.getBrandId()),
+            return new AdminChartItem(hex(chart.getId()), hex(chart.getBrandId()),
                     chart.getCategory(), chart.getSizingSystem(), chart.getRegion(), null,
                     chart.getCollection(), chart.getMeasurementBasis(), chart.getUnit(),
                     chart.isGarmentFlat(), chart.getFitType(), chart.getSizes(), chart.getDataSource(),
@@ -292,7 +292,7 @@ public class AdminDataController {
                     chart.getUpdatedAt(), chart.isActive(), "BRAND_CHART", true, null);
         }
         static AdminChartItem from(Product product, ProductSizeSpec spec) {
-            return new AdminChartItem(Ids.hex(spec.getId()), Ids.hex(product.getBrandId()),
+            return new AdminChartItem(hex(spec.getId()), hex(product.getBrandId()),
                     product.getCategory(), product.getSizingSystem(), product.getRegion(), product.getName(),
                     null, spec.getMeasurementBasis(), spec.getUnit(), spec.isGarmentFlat(),
                     product.getFitType(), spec.getSizes(), spec.getDataSource(), spec.getSourceUrl(),
