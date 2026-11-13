@@ -211,6 +211,30 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
         seedAdidas();
         seedPuma();
         seedZara();
+
+        // Directory-only entries: do not invent size charts or recommendation categories.
+        catalogBrand("allen-solly", "Allen Solly", "IN", "https://www.allensolly.com/");
+        catalogBrand("van-heusen", "Van Heusen", "US", "https://www.vanheusenindia.com/");
+        catalogBrand("peter-england", "Peter England", "IN", "https://www.peterengland.com/");
+        catalogBrand("us-polo-assn", "U.S. Polo Assn.", "US", "https://uspoloassn.in/");
+        catalogBrand("jack-jones", "Jack & Jones", "DK", "https://www.jackjones.in/");
+        catalogBrand("tommy-hilfiger", "Tommy Hilfiger", "US", "https://in.tommy.com/");
+        catalogBrand("calvin-klein", "Calvin Klein", "US", "https://www.calvinklein.in/");
+        catalogBrand("biba", "BIBA", "IN", "https://www.biba.in/");
+        catalogBrand("fabindia", "Fabindia", "IN", "https://www.fabindia.com/");
+        catalogBrand("w-for-woman", "W for Woman", "IN", "https://www.wforwoman.com/");
+        catalogBrand("decathlon", "Decathlon", "FR", "https://www.decathlon.in/");
+        catalogBrand("pepe-jeans", "Pepe Jeans", "GB", "https://www.pepejeans.in/");
+        catalogBrand("bonkers-corner", "Bonkers Corner", "IN", "https://www.bonkerscorner.com/");
+    }
+
+    private Brand catalogBrand(String slug, String name, String origin, String officialUrl) {
+        Brand brand = saveBrand(slug, name, officialUrl, List.of(),
+                "Brand directory entry only. No size chart data has been imported yet; categories will appear only after source-backed size charts are added.");
+        brand.setCountry(origin);
+        brand.setSupportedRegions(List.of("IN"));
+        brand.setSizingSystemsByCategory(new EnumMap<>(Category.class));
+        return brands.save(brand);
     }
 
     private static SizeEntry bodyEntry(String label, double chest, double waist, double hips, double shoulder) {
