@@ -26,3 +26,6 @@ export const createAdminChart = (payload) => request('/api/admin/data/charts', {
 export const updateAdminChart = (id, payload) => request(`/api/admin/data/charts/${id}`, { method: 'PUT', body: JSON.stringify(payload) })
 export const setAdminChartVerified = (id, verified) => request(`/api/admin/data/charts/${id}/verification`, { method: 'PATCH', body: JSON.stringify({ verified }) })
 export const setAdminChartActive = (id, active) => request(`/api/admin/data/charts/${id}/active`, { method: 'PATCH', body: JSON.stringify({ active }) })
+
+export const setAdminProductSpecVerified = (id, verified) => request(`/api/admin/data/product-specs/${id}/verification`, { method: 'PATCH', body: JSON.stringify({ verified }) })
+export const setAdminProductSpecActive = (id, active) => request(`/api/admin/data/product-specs/${id}/active`, { method: 'PATCH', body: JSON.stringify({ active }) })
