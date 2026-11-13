@@ -165,6 +165,51 @@ public class AdminDataController {
         return SizeChartResponse.from(chartRepository.save(chart));
     }
 
+    @PatchMapping("/product-specs/{specId}/verification")
+    public AdminChartItem verifyProductSpec(@PathVariable String specId, @RequestBody VerifyRequest request,
+                                            Authentication auth) {
+        requireAdmin(auth);
+        if (request == null || request.verified() == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "verified is required");
+        ProductSizeSpec spec = productSizeSpecRepository.findById(new ObjectId(validId(specId, "product size spec")))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product size specification not found"));
+        Product product = productRepository.findById(spec.getProductId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+        if (request.verified()) {
+            if (spec.getSourceUrl() == null || spec.getSourceUrl().isBlank()
+                    || spec.getDataSource() == null || spec.getDataSource().isBlank())
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A source name and source URL are required before verification");
+            if (spec.getSizes() == null || spec.getSizes().isEmpty()
+                    || spec.getSizes().stream().anyMatch(s -> s.getLabel() == null || s.getLabel().isBlank()
+                    || s.getMeasurements() == null || s.getMeasurements().isEmpty()))
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Every size needs a label and measurements");
+            spec.setVerificationStatus(VerificationStatus.VERIFIED);
+            spec.setLastVerifiedAt(Instant.now());
+            product.setVerificationStatus(VerificationStatus.VERIFIED);
+        } else {
+            spec.setVerificationStatus(VerificationStatus.UNVERIFIED);
+            spec.setLastVerifiedAt(null);
+            product.setVerificationStatus(VerificationStatus.UNVERIFIED);
+        }
+        productRepository.save(product);
+        return AdminChartItem.from(product, productSizeSpecRepository.save(spec));
+    }
+
+    @PatchMapping("/product-specs/{specId}/active")
+    public AdminChartItem setProductSpecActive(@PathVariable String specId, @RequestBody ActiveRequest request,
+                                               Authentication auth) {
+        requireAdmin(auth);
+        if (request == null || request.active() == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "active is required");
+        ProductSizeSpec spec = productSizeSpecRepository.findById(new ObjectId(validId(specId, "product size spec")))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product size specification not found"));
+        Product product = productRepository.findById(spec.getProductId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+        product.setActive(request.active());
+        productRepository.save(product);
+        return AdminChartItem.from(product, spec);
+    }
+
     private SizeChart buildChart(SizeChart chart, ChartRequest r, Brand brand) {
         if (r == null || r.category() == null || r.sizingSystem() == null || r.measurementBasis() == null
                 || r.unit() == null || r.region() == null || r.region().isBlank()
