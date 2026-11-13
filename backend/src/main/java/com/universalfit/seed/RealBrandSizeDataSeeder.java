@@ -198,12 +198,13 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
     private void seedNike() {
         String menUrl = "https://www.nike.com/size-fit/mens-tops-asian-alpha";
         String womenUrl = "https://img.nike.com.hk/resources/sizecart/asian-womens-tops-sizing-chart_en.html";
-        Brand nike = saveBrand("nike", "Nike", menUrl, List.of(Category.T_SHIRT),
-                "Official Nike Asian body-size charts for men's and women's tops. Region is ASIA, not India; records remain UNVERIFIED.");
+        Brand nike = saveBrand("nike", "Nike", menUrl, List.of(Category.T_SHIRT, Category.TROUSERS),
+                "Official Nike Asian body-size charts for men's and women's tops and women's bottoms. Region is ASIA, not India; records remain UNVERIFIED.");
         nike.setCountry("US");
         nike.setSupportedRegions(List.of("ASIA"));
-        nike.setSizingSystemsByCategory(Map.of(Category.T_SHIRT,
-                List.of(SizingSystem.MEN, SizingSystem.WOMEN)));
+        nike.setSizingSystemsByCategory(Map.of(
+                Category.T_SHIRT, List.of(SizingSystem.MEN, SizingSystem.WOMEN),
+                Category.TROUSERS, List.of(SizingSystem.WOMEN)));
         brands.save(nike);
         product(nike, "Men's Tops (Asian Sizing)", Category.T_SHIRT, SizingSystem.MEN,
                 menUrl, FitPreference.REGULAR, MeasurementBasis.BODY, "ASIA",
@@ -219,15 +220,25 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                     nikeEntry("S",80,68.5,71.5,89.5,92.5), nikeEntry("M",84,71.5,75.5,92.5,96.5),
                     nikeEntry("L",88,75.5,80.5,96.5,101.5), nikeEntry("XL",92,80.5,85.5,101.5,106.5),
                     nikeEntry("2XL",96,85.5,90.5,106.5,111.5)));
+        String womenBottomsUrl = "https://img.nike.com.hk/resources/sizecart/womens-pants-sizing-chart_en.html";
+        product(nike, "Women's Bottoms (Asian Sizing)", Category.TROUSERS, SizingSystem.WOMEN,
+                womenBottomsUrl, FitPreference.REGULAR, MeasurementBasis.BODY, "ASIA",
+                List.of(
+                    nikeBottomRow("XXS",54,60,78,84), nikeBottomRow("XS",60,67,84,91),
+                    nikeBottomRow("S",67,74,91,98), nikeBottomRow("M",74,81,98,105),
+                    nikeBottomRow("L",81,88,105,112), nikeBottomRow("XL",88,98,112,120),
+                    nikeBottomRow("2XL",98,108,120,128)));
     }
 
     private void seedAdidas() {
         String url = "https://www.adidas.com/us/help/size_charts";
-        Brand adidas = saveBrand("adidas", "adidas", url, List.of(Category.T_SHIRT),
-                "Official adidas US men's shirts and tops body-size chart. Region is US, not India; imported rows remain UNVERIFIED.");
+        Brand adidas = saveBrand("adidas", "adidas", url, List.of(Category.T_SHIRT, Category.TROUSERS),
+                "Official adidas US body-size charts for men's tops, women's tops and women's bottoms. Region is US, not India; imported rows remain UNVERIFIED.");
         adidas.setCountry("DE");
         adidas.setSupportedRegions(List.of("US"));
-        adidas.setSizingSystemsByCategory(Map.of(Category.T_SHIRT, List.of(SizingSystem.MEN)));
+        adidas.setSizingSystemsByCategory(Map.of(
+                Category.T_SHIRT, List.of(SizingSystem.MEN, SizingSystem.WOMEN),
+                Category.TROUSERS, List.of(SizingSystem.WOMEN)));
         brands.save(adidas);
         product(adidas, "Men's Shirts & Tops (US Sizing)", Category.T_SHIRT, SizingSystem.MEN,
                 url, FitPreference.REGULAR, MeasurementBasis.BODY, "US",
@@ -236,6 +247,22 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                     bodyRow("M",93,100,81,88,92,99), bodyRow("L",101,108,89,96,100,107),
                     bodyRow("XL",109,118,97,106,108,116), bodyRow("2XL",119,130,107,119,117,125),
                     bodyRow("3XL",131,142,120,132,126,135)));
+        String womenTopsUrl = "https://www.adidas.com/us/help/size_charts/women-shirts_tops/";
+        product(adidas, "Women's Shirts & Tops (US Sizing)", Category.T_SHIRT, SizingSystem.WOMEN,
+                womenTopsUrl, FitPreference.REGULAR, MeasurementBasis.BODY, "US",
+                List.of(
+                    bodyRow("2XS",73,76,57,60,82,85), bodyRow("XS",77,82,61,66,86,91),
+                    bodyRow("S",83,88,67,72,92,97), bodyRow("M",89,94,73,78,98,103),
+                    bodyRow("L",95,101,79,85,104,110), bodyRow("XL",102,109,86,94,111,117),
+                    bodyRow("2XL",110,118,95,104,118,125)));
+        String womenBottomsUrl = "https://www.adidas.com/us/help/size_charts/women-pants_shorts";
+        product(adidas, "Women's Pants & Shorts (US Sizing)", Category.TROUSERS, SizingSystem.WOMEN,
+                womenBottomsUrl, FitPreference.REGULAR, MeasurementBasis.BODY, "US",
+                List.of(
+                    bodyBottomRow("2XS",57,60,82,85,77.5), bodyBottomRow("XS",61,66,86,91,78),
+                    bodyBottomRow("S",67,72,92,97,78.5), bodyBottomRow("M",73,78,98,103,79),
+                    bodyBottomRow("L",79,85,104,110,79.5), bodyBottomRow("XL",86,94,111,117,80),
+                    bodyBottomRow("2XL",95,104,118,125,80.5)));
     }
 
     private void seedPuma() {
@@ -245,6 +272,23 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
         puma.setCountry("DE");
         puma.setSupportedRegions(List.of("IN"));
         brands.save(puma);
+    }
+
+    private static SizeEntry nikeBottomRow(String label, double waistMin, double waistMax,
+                                           double hipMin, double hipMax) {
+        Map<String, MeasurementRange> m = new LinkedHashMap<>();
+        m.put("waist", MeasurementRange.of(waistMin, waistMax));
+        m.put("hips", MeasurementRange.of(hipMin, hipMax));
+        return new SizeEntry(label, m);
+    }
+
+    private static SizeEntry bodyBottomRow(String label, double waistMin, double waistMax,
+                                           double hipMin, double hipMax, double inseam) {
+        Map<String, MeasurementRange> m = new LinkedHashMap<>();
+        m.put("waist", MeasurementRange.of(waistMin, waistMax));
+        m.put("hips", MeasurementRange.of(hipMin, hipMax));
+        m.put("inseam", MeasurementRange.of(inseam));
+        return new SizeEntry(label, m);
     }
 
     private static SizeEntry nikeEntry(String label, double chest,
@@ -326,7 +370,7 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
         product.setProductUrl(sourceUrl);
         product.setFitType(fit);
         product.setAvailableSizes(sizes.stream().map(SizeEntry::getLabel).toList());
-        product.setDataSource(SOURCE);
+        product.setDataSource(sourceUrl);
         product.setVerificationStatus(VerificationStatus.UNVERIFIED);
         product.setActive(true);
         product = products.save(product);
@@ -337,7 +381,7 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
         spec.setUnit(Unit.CM);
         spec.setGarmentFlat(false);
         spec.setSizes(sizes);
-        spec.setDataSource(SOURCE);
+        spec.setDataSource(sourceUrl);
         spec.setSourceUrl(sourceUrl);
         spec.setVerificationStatus(VerificationStatus.UNVERIFIED);
         spec.setRecommendationEligible(true);
