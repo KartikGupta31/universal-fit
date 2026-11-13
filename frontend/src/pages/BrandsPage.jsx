@@ -63,19 +63,22 @@ function BrandsPage() {
                 <div className="brand-directory-grid">
                     {filtered.map(brand => {
                         const supported = brand.categories || []
-                        const ready = supported.length > 0
+                        const hasSizingCategories = supported.length > 0
+                        const verified = brand.verificationStatus === 'VERIFIED'
+                        const regions = brand.supportedRegions || []
                         return (
                             <article className="brand-directory-card" key={brand.id}>
                                 <div className="brand-card-top"><span className="brand-logo-wrap">
                                     {brandDomains[brand.name] ? <img className="brand-logo" src={`https://www.google.com/s2/favicons?domain=${brandDomains[brand.name]}&sz=128`} alt={`${brand.name} logo`} loading="lazy" onError={event => { event.currentTarget.style.display = 'none'; event.currentTarget.nextElementSibling.style.display = 'grid' }} /> : null}
                                     <span className="brand-logo-fallback" style={{ display: brandDomains[brand.name] ? 'none' : 'grid' }}>{brand.name.slice(0, 1).toUpperCase()}</span>
-                                </span><span className={ready ? 'data-pill data-ready' : 'data-pill data-pending'}>{ready ? 'CATEGORIES AVAILABLE' : 'DATA IN PROGRESS'}</span></div>
+                                </span><span className={hasSizingCategories ? 'data-pill data-ready' : 'data-pill data-pending'}>{hasSizingCategories ? 'SIZING CATEGORIES LISTED' : 'NO SIZING DATA YET'}</span></div>
                                 <h3 className="brand-card-name">{brand.name}</h3>
-                                <p className="brand-origin">{brand.country ? `Origin: ${brand.country}` : 'Brand sizing directory'}</p>
+                                <p className="brand-origin">{brand.country ? `Brand origin: ${brand.country}` : 'Brand sizing directory'}</p>
+                                <p className="brand-origin">{regions.length ? `Sizing regions: ${regions.join(', ')}` : 'Sizing region not specified'}</p>
                                 <div className="brand-card-divider" />
                                 <p className="brand-card-label">SUPPORTED CATEGORIES</p>
-                                {supported.length ? <div className="brand-category-tags">{supported.map(item => <span key={item}>{categoryLabels[item] || item}</span>)}</div> : <p className="brand-empty-note">Recommendation-ready categories are not available yet.</p>}
-                                <div className="brand-card-footer"><span>{brand.verificationStatus === 'VERIFIED' ? <><ShieldCheck size={14} /> Verified data</> : <><AlertCircle size={14} /> {brand.verificationStatus === 'DEMO_UNVERIFIED' ? 'Demo data' : 'Unverified data'}</>}</span>{ready && <Link to="/find-size">Find my size <ArrowUpRight size={14} /></Link>}</div>
+                                {hasSizingCategories ? <><div className="brand-category-tags">{supported.map(item => <span key={item}>{categoryLabels[item] || item}</span>)}</div><p className="brand-empty-note">Category sizing data is listed. Availability depends on region and sizing system.</p></> : <p className="brand-empty-note">No recommendation categories are available yet. Sizing data is still being added.</p>}
+                                <div className="brand-card-footer"><span>{verified ? <><ShieldCheck size={14} /> Verified chart data</> : <><AlertCircle size={14} /> {brand.verificationStatus === 'DEMO_UNVERIFIED' ? 'Demo data — not for use' : 'Unverified chart data'}</>}</span>{hasSizingCategories && <Link to="/find-size">Find my size <ArrowUpRight size={14} /></Link>}</div>
                             </article>
                         )
                     })}
