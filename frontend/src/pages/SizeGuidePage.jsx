@@ -33,7 +33,7 @@ function MeasurementDiagram({ type, label }) {
         foot: <><path d="M68 302 Q90 294 112 302 L151 308 Q164 311 160 320 L72 320 Q58 316 68 302 Z" /><path d="M70 296 L160 296" /><path d="M70 290 L70 302 M160 290 L160 302" /></>,
     }
     return <div className="measurement-diagram" role="img" aria-label={label + ' measurement placement diagram'}>
-        <svg viewBox="0 0 210 340" xmlns="http://www.w3.org/2000/svg">
+        {type === 'foot' ? <img className="foot-length-photo" src="https://cdn.shopify.com/s/files/1/0764/7687/5004/files/foot-measurement-diagram.png?v=1761662253" alt="Side-view foot with heel and longest toe marked to show foot-length measurement" loading="lazy" /> : <svg viewBox="0 0 210 340" xmlns="http://www.w3.org/2000/svg">
             {type === 'foot' ? <>
                 <g className="diagram-body">
                     <path d="M38 174 C38 158 47 143 61 136 C76 128 91 130 105 124 C120 117 130 99 145 91 C158 84 174 88 181 101 C188 114 181 128 174 139 C166 151 163 164 165 178 C168 195 160 211 145 218 C128 226 110 216 96 211 C80 205 65 211 51 202 C42 196 38 186 38 174 Z" />
@@ -54,7 +54,7 @@ function MeasurementDiagram({ type, label }) {
                 <g className="diagram-measure">{lines[type]}</g>
                 <g className="diagram-endpoints">{type === 'height' ? <><circle cx="177" cy="20" r="3"/><circle cx="177" cy="320" r="3"/></> : null}</g>
             </>}
-        </svg>
+        </svg>}
         <span>{label}</span>
     </div>
 }

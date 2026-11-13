@@ -15,3 +15,7 @@
 .diagram-endpoints{fill:#e87532}
 .measurement-diagram>span{max-width:80px;color:#9b704b;font-size:10px;font-weight:700;line-height:1.4}
 @media(max-width:600px){.measurement-diagram{height:145px}.measurement-diagram svg{height:128px}}
+
+.foot-length-photo{width:100%;height:142px;max-width:190px;object-fit:contain;border-radius:7px;background:#fff;mix-blend-mode:multiply}
+.measurement-diagram:has(.foot-length-photo){justify-content:center}
+@media(max-width:600px){.foot-length-photo{height:128px}}
