@@ -220,14 +220,14 @@ public class RealBrandSizeDataSeeder implements ApplicationRunner {
                     nikeEntry("S",80,68.5,71.5,89.5,92.5), nikeEntry("M",84,71.5,75.5,92.5,96.5),
                     nikeEntry("L",88,75.5,80.5,96.5,101.5), nikeEntry("XL",92,80.5,85.5,101.5,106.5),
                     nikeEntry("2XL",96,85.5,90.5,106.5,111.5)));
-        String womenBottomsUrl = "https://img.nike.com.hk/resources/sizecart/womens-pants-sizing-chart_en.html";
+        String womenBottomsUrl = "https://img.nike.com.hk/resources/sizecart/asian-womens-pants-sizing-chart_en.html";
         product(nike, "Women's Bottoms (Asian Sizing)", Category.TROUSERS, SizingSystem.WOMEN,
                 womenBottomsUrl, FitPreference.REGULAR, MeasurementBasis.BODY, "ASIA",
                 List.of(
-                    nikeBottomRow("XXS",54,60,78,84), nikeBottomRow("XS",60,67,84,91),
-                    nikeBottomRow("S",67,74,91,98), nikeBottomRow("M",74,81,98,105),
-                    nikeBottomRow("L",81,88,105,112), nikeBottomRow("XL",88,98,112,120),
-                    nikeBottomRow("2XL",98,108,120,128)));
+                    nikeBottomRow("XXS",54,54,83.5,86.5), nikeBottomRow("XS",58,58,86.5,89.5),
+                    nikeBottomRow("S",62,62,89.5,92.5), nikeBottomRow("M",66,66,92.5,96.5),
+                    nikeBottomRow("L",70,70,96.5,101.5), nikeBottomRow("XL",74,74,101.5,106.5),
+                    nikeBottomRow("2XL",78,78,106.5,111.5)));
     }
 
     private void seedAdidas() {
