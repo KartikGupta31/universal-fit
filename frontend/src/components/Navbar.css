@@ -1,140 +1,18 @@
-.navbar {
-    width: 100%;
-    min-height: 82px;
-    padding: 0 6%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #faf9f6;
-    border-bottom: 1px solid #e9e5de;
-    position: relative;
-    z-index: 10;
-}
-
-.navbar-logo {
-    color: #171717;
-    text-decoration: none;
-    font-size: 23px;
-    font-weight: 700;
-    letter-spacing: -1px;
-    display: flex;
-    flex-direction: column;
-    line-height: 1.1;
-}
-
-.navbar-logo span {
-    color: #a47b55;
-    display: inline;
-}
-
-.navbar-logo small {
-    margin-top: 6px;
-    font-size: 9px;
-    font-weight: 500;
-    letter-spacing: 2px;
-    color: #77716a;
-}
-
-.navbar-links {
-    display: flex;
-    align-items: center;
-    gap: 34px;
-}
-
-.nav-link {
-    color: #393630;
-    text-decoration: none;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    transition: color 0.2s;
-}
-
-.nav-link:hover,
-.nav-link.active {
-    color: #a47b55;
-}
-
-.navbar-actions {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-}
-
-.login-link {
-    color: #292723;
-    text-decoration: none;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 1px;
-}
-
-.profile-button {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    padding: 13px 19px;
-    background: #24231f;
-    color: white;
-    text-decoration: none;
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    transition: background 0.2s;
-}
-
-.profile-button:hover {
-    background: #a47b55;
-}
-
-.mobile-menu {
-    display: none;
-    background: none;
-    border: none;
-    color: #222;
-    cursor: pointer;
-}
-
-@media (max-width: 900px) {
-    .navbar {
-        padding: 0 5%;
-    }
-
-    .navbar-links {
-        gap: 15px;
-    }
-
-    .navbar-actions {
-        gap: 12px;
-    }
-}
-
-@media (max-width: 650px) {
-    .navbar {
-        min-height: 72px;
-    }
-
-    .navbar-links,
-    .navbar-actions {
-        display: none;
-    }
-
-    .mobile-menu {
-        display: block;
-    }
-}
-
-.admin-nav-link {
-    color: #8a623f;
-    font-weight: 700;
-}
-
-.account-status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #292723;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1px;
-}
+.uf-navbar { min-height:82px; padding:0 4vw; display:flex; align-items:center; justify-content:space-between; gap:24px; position:sticky; top:0; z-index:50; background:#f7f5efeb; backdrop-filter:blur(18px); border-bottom:1px solid #17171324; }
+.uf-navbar-logo { color:#171713; text-decoration:none; display:grid; grid-template-columns:28px auto; grid-template-rows:1fr 12px; align-items:center; column-gap:10px; font-size:11px; font-weight:400; letter-spacing:.15em; white-space:nowrap; }
+.uf-logo-mark { grid-row:1 / 3; display:flex; align-items:center; gap:2px; height:27px; transform:skewY(-8deg); }
+.uf-logo-mark i { display:block; width:7px; height:20px; background:#171713; border-radius:7px 1px; }
+.uf-logo-mark i:nth-child(2) { height:26px; } .uf-logo-mark i:nth-child(3) { height:15px; }
+.uf-logo-word b { font-weight:700; } .uf-navbar-logo small { font-size:7px; letter-spacing:.13em; color:#89867d; margin-top:3px; }
+.uf-navbar .navbar-links { display:flex; align-items:center; gap:clamp(16px,2.4vw,34px); }
+.uf-navbar .nav-link,.uf-navbar .login-link { color:#67665e; text-decoration:none; font-size:10px; letter-spacing:.1em; position:relative; white-space:nowrap; }
+.uf-navbar .nav-link:after { content:''; position:absolute; height:1px; background:#171713; left:0; right:100%; bottom:-8px; transition:.2s; }
+.uf-navbar .nav-link:hover:after,.uf-navbar .nav-link.active:after { right:0; }
+.uf-navbar .nav-link.active { color:#171713; }
+.uf-navbar .navbar-actions { display:flex; align-items:center; gap:20px; }
+.uf-navbar .profile-button { display:flex; align-items:center; gap:12px; min-height:42px; padding:0 17px; background:#171713; color:white; text-decoration:none; font-size:10px; letter-spacing:.04em; }
+.uf-navbar .account-status { display:flex; align-items:center; gap:8px; color:#171713; text-decoration:none; font-size:10px; letter-spacing:.1em; }
+.uf-navbar .mobile-menu { display:none; border:0; background:transparent; padding:8px; color:#171713; }
+@media(max-width:900px) { .uf-navbar { gap:12px; } .uf-navbar .navbar-links { gap:15px; } .uf-navbar .nav-link { font-size:9px; } .uf-navbar .navbar-actions { gap:12px; } }
+@media(max-width:700px) { .uf-navbar { min-height:70px; padding:0 5%; } .uf-navbar .mobile-menu { display:block; order:3; } .uf-navbar .navbar-actions { margin-left:auto; } .uf-navbar .navbar-links { display:none; position:absolute; top:100%; left:0; right:0; padding:20px 6%; background:#f7f5ef; border-bottom:1px solid #17171324; flex-direction:column; align-items:flex-start; gap:22px; box-shadow:0 15px 25px #17171312; } .uf-navbar .navbar-links.is-open { display:flex; } .uf-navbar .navbar-actions .login-link { display:none; } .uf-navbar .profile-button { min-height:36px; padding:0 11px; font-size:9px; } }
+@media(max-width:390px) { .uf-navbar-logo small { display:none; } .uf-navbar-logo { grid-template-rows:1fr; } .uf-navbar .profile-button { font-size:8px; padding:0 8px; } }
