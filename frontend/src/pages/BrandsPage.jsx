@@ -5,9 +5,28 @@ import { getBrands } from '../services/recommendationService'
 import './DiscoveryPages.css'
 
 const brandDomains = {
-    'Zara': 'zara.com', 'H&M': 'hm.com', 'UNIQLO': 'uniqlo.com', "Levi's": 'levi.com',
-    'Nike': 'nike.com', 'adidas': 'adidas.com', 'PUMA': 'puma.com', 'GAP': 'gap.com',
-    'Tommy Hilfiger': 'tommy.com', 'Demo Brand': null,
+    'Zara': 'zara.com',
+    'H&M': 'hm.com',
+    'UNIQLO': 'uniqlo.com',
+    "Levi's": 'levi.com',
+    'Nike': 'nike.com',
+    'adidas': 'adidas.com',
+    'PUMA': 'puma.com',
+    'GAP': 'gap.com',
+    'Tommy Hilfiger': 'tommy.com',
+    'Allen Solly': 'allensolly.com',
+    'Van Heusen': 'vanheusenindia.com',
+    'Peter England': 'peterengland.com',
+    'U.S. Polo Assn.': 'uspoloassn.in',
+    'Jack & Jones': 'jackjones.in',
+    'Calvin Klein': 'calvinklein.in',
+    'BIBA': 'biba.in',
+    'Fabindia': 'fabindia.com',
+    'W for Woman': 'wforwoman.com',
+    'Decathlon': 'decathlon.in',
+    'Pepe Jeans': 'pepejeans.in',
+    'Bonkers Corner': 'bonkerscorner.com',
+    'Demo Brand': null,
 }
 const categoryLabels = { T_SHIRT: 'T-shirts', SHIRT: 'Shirts', JEANS: 'Jeans', TROUSERS: 'Trousers', JACKET: 'Jackets', HOODIE: 'Hoodies', DRESS: 'Dresses', TOP: 'Tops' }
 
