@@ -1,14 +1,13 @@
-
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ArrowRight, UserRound, Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import GoogleSignInButton from '../components/GoogleSignInButton'
 import './AuthPage.css'
 
 function RegisterPage() {
-    const { register } = useAuth()
+    const { register, loginWithGoogle } = useAuth()
     const navigate = useNavigate()
-
     const [displayName, setDisplayName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -18,22 +17,33 @@ function RegisterPage() {
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
 
+    const handleGoogleCredential = useCallback(async (credential) => {
+        setError('')
+        setLoading(true)
+        try {
+            await loginWithGoogle(credential)
+            navigate('/find-size')
+        } catch (err) {
+            setError(err.message || 'Google sign-in failed. Please try again.')
+        } finally {
+            setLoading(false)
+        }
+    }, [loginWithGoogle, navigate])
+
+    const handleGoogleError = useCallback((message) => setError(message), [])
+
     async function handleSubmit(e) {
         e.preventDefault()
         setError('')
-
         if (password.length < 8) {
             setError('Password must contain at least 8 characters.')
             return
         }
-
         if (password !== confirmPassword) {
             setError('Passwords do not match.')
             return
         }
-
         setLoading(true)
-
         try {
             await register(email, password, displayName)
             navigate('/find-size')
@@ -47,96 +57,59 @@ function RegisterPage() {
     return (
         <main className="auth-page">
             <section className="auth-card">
-                <div className="auth-icon">
-                    <UserRound size={22} />
-                </div>
-
+                <div className="auth-icon"><UserRound size={22} /></div>
                 <p className="auth-overline">START YOUR FIT JOURNEY</p>
                 <h1>Create your profile.</h1>
-
                 <p className="auth-description">
-                    One profile. Every brand. Create your account and discover your
-                    perfect fit.
+                    One profile. Every brand. Create your account and discover your perfect fit.
                 </p>
+
+                <GoogleSignInButton
+                    onCredential={handleGoogleCredential}
+                    onError={handleGoogleError}
+                    disabled={loading}
+                />
+                <div className="auth-divider">OR SIGN UP WITH EMAIL</div>
 
                 <form onSubmit={handleSubmit} className="auth-form">
                     <label htmlFor="displayName">FULL NAME</label>
-                    <input
-                        id="displayName"
-                        type="text"
-                        placeholder="Your full name"
-                        value={displayName}
-                        onChange={(e) => setDisplayName(e.target.value)}
-                        autoComplete="name"
-                        required
-                    />
-
+                    <input id="displayName" type="text" placeholder="Your full name"
+                        value={displayName} onChange={(e) => setDisplayName(e.target.value)}
+                        autoComplete="name" required />
                     <label htmlFor="registerEmail">EMAIL ADDRESS</label>
-                    <input
-                        id="registerEmail"
-                        type="email"
-                        placeholder="you@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        autoComplete="email"
-                        required
-                    />
-
+                    <input id="registerEmail" type="email" placeholder="you@example.com"
+                        value={email} onChange={(e) => setEmail(e.target.value)}
+                        autoComplete="email" required />
                     <label htmlFor="registerPassword">PASSWORD</label>
                     <div className="password-wrapper">
-                        <input
-                            id="registerPassword"
-                            type={showPassword ? 'text' : 'password'}
-                            placeholder="Minimum 8 characters"
-                            value={password}
+                        <input id="registerPassword" type={showPassword ? 'text' : 'password'}
+                            placeholder="Minimum 8 characters" value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            autoComplete="new-password"
-                            minLength={8}
-                            required
-                        />
-
-                        <button
-                            type="button"
-                            className="password-toggle"
+                            autoComplete="new-password" minLength={8} required />
+                        <button type="button" className="password-toggle"
                             onClick={() => setShowPassword(!showPassword)}
-                            aria-label={showPassword ? 'Hide password' : 'Show password'}
-                        >
+                            aria-label={showPassword ? 'Hide password' : 'Show password'}>
                             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                         </button>
                     </div>
-
                     <label htmlFor="confirmPassword">CONFIRM PASSWORD</label>
                     <div className="password-wrapper">
-                        <input
-                            id="confirmPassword"
-                            type={showConfirmPassword ? 'text' : 'password'}
-                            placeholder="Enter your password again"
-                            value={confirmPassword}
+                        <input id="confirmPassword" type={showConfirmPassword ? 'text' : 'password'}
+                            placeholder="Enter your password again" value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            autoComplete="new-password"
-                            required
-                        />
-
-                        <button
-                            type="button"
-                            className="password-toggle"
+                            autoComplete="new-password" required />
+                        <button type="button" className="password-toggle"
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            aria-label={
-                                showConfirmPassword ? 'Hide password' : 'Show password'
-                            }
-                        >
+                            aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}>
                             {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                         </button>
                     </div>
-
-                    {error && <p className="auth-error">{error}</p>}
-
+                    {error && <p className="auth-error" role="alert">{error}</p>}
                     <button type="submit" disabled={loading}>
                         {loading ? 'CREATING ACCOUNT...' : 'CREATE ACCOUNT'}
                         {!loading && <ArrowRight size={17} />}
                     </button>
                 </form>
-
                 <p className="auth-switch">
                     Already have an account? <Link to="/login">Sign in</Link>
                 </p>
@@ -145,4 +118,4 @@ function RegisterPage() {
     )
 }
 
-export default RegisterPage;
+export default RegisterPage
