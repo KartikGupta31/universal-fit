@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import {
     login as loginRequest,
     register as registerRequest,
+    loginWithGoogle as googleLoginRequest,
     logout as logoutRequest,
     getAccessToken,
 } from '../services/authService'
@@ -17,29 +18,19 @@ export function AuthProvider({ children }) {
             setUser(null)
             return
         }
-
         const controller = new AbortController()
-
         async function loadCurrentUser() {
             try {
                 const response = await fetch('/api/users/me', {
                     headers: { Authorization: `Bearer ${token}` },
                     signal: controller.signal,
                 })
-
-                if (!response.ok) {
-                    throw new Error('Unable to load account details')
-                }
-
-                const profile = await response.json()
-                setUser(profile)
+                if (!response.ok) throw new Error('Unable to load account details')
+                setUser(await response.json())
             } catch (error) {
-                if (error.name !== 'AbortError') {
-                    setUser(null)
-                }
+                if (error.name !== 'AbortError') setUser(null)
             }
         }
-
         loadCurrentUser()
         return () => controller.abort()
     }, [token])
@@ -56,6 +47,12 @@ export function AuthProvider({ children }) {
         return data
     }
 
+    async function loginWithGoogle(credential) {
+        const data = await googleLoginRequest(credential)
+        setToken(data.accessToken)
+        return data
+    }
+
     function logout() {
         logoutRequest()
         setToken(null)
@@ -63,18 +60,17 @@ export function AuthProvider({ children }) {
     }
 
     return (
-        <AuthContext.Provider
-            value={{
-                token,
-                user,
-                role: user?.role ?? null,
-                isAdmin: user?.role === 'ADMIN',
-                isAuthenticated: Boolean(token),
-                login,
-                register,
-                logout,
-            }}
-        >
+        <AuthContext.Provider value={{
+            token,
+            user,
+            role: user?.role ?? null,
+            isAdmin: user?.role === 'ADMIN',
+            isAuthenticated: Boolean(token),
+            login,
+            register,
+            loginWithGoogle,
+            logout,
+        }}>
             {children}
         </AuthContext.Provider>
     )
